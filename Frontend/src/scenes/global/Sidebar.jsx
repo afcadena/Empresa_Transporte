@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Sidebar as ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { useNavigate } from "react-router-dom"; // Usar useNavigate para redirección
 import { tokens } from "../../Theme";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
+import DirectionsBusIcon from '@mui/icons-material/DirectionsBus'; // Icono para Profile Form
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
-import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
+import DashboardIcon from '@mui/icons-material/Dashboard'; // Icono para FAQ
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
@@ -34,6 +34,13 @@ const SidebarComponent = () => {
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Profile Form");
+  const [userName, setUserName] = useState("");
+
+  useEffect(() => {
+    // Obtener el nombre o correo del usuario desde localStorage (o de cualquier otro lugar)
+    const loggedInUser = localStorage.getItem("userEmail") || "Usuario";
+    setUserName(loggedInUser);
+  }, []);
 
   return (
     <Box
@@ -74,7 +81,7 @@ const SidebarComponent = () => {
                 background={colors.primary[400]}
               >
                 <Typography variant="h3" color="#1F2A40">
-                  ADMINIS
+                 EmpreTrans
                 </Typography>
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                   <MenuOutlinedIcon style={{ color: '#1F2A40' }} />
@@ -85,15 +92,6 @@ const SidebarComponent = () => {
 
           {!isCollapsed && (
             <Box mb="25px">
-              <Box display="flex" justifyContent="center" alignItems="center">
-                <img
-                  alt="profile-user"
-                  width="100px"
-                  height="100px"
-                  src={`../../assets/user.png`}
-                  style={{ cursor: "pointer", borderRadius: "50%" }}
-                />
-              </Box>
               <Box textAlign="center">
                 <Typography
                   variant="h2"
@@ -101,10 +99,10 @@ const SidebarComponent = () => {
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
-                  Ed Roh
+                  {userName}
                 </Typography>
                 <Typography variant="h5" color="#1F2A40">
-                  VP Fancy Admin
+                  Administrador
                 </Typography>
               </Box>
             </Box>
@@ -119,9 +117,9 @@ const SidebarComponent = () => {
               Pages
             </Typography>
             <Item
-              title="Profile Form"
+              title="Camiones"
               to="/form"
-              icon={<PersonOutlinedIcon />}
+              icon={<DirectionsBusIcon />}
               selected={selected}
               setSelected={setSelected}
             />
@@ -133,9 +131,9 @@ const SidebarComponent = () => {
               setSelected={setSelected}
             />
             <Item
-              title="FAQ Page"
+              title="Dashboard"
               to="/faq"
-              icon={<HelpOutlineOutlinedIcon />}
+              icon={<DashboardIcon />}
               selected={selected}
               setSelected={setSelected}
             />

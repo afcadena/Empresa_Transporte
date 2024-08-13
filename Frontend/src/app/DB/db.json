@@ -1,35 +1,41 @@
 {
-    "administrador": [
-      {
-        "id": 1,
-        "nombre": "Admin1",
-        "correo": "admin1@example.com",
-        "contraseña": "password123",
-        "rol": "superadmin"
-      },
-      {
-        "id": 2,
-        "nombre": "Admin2",
-        "correo": "admin2@example.com",
-        "contraseña": "password456",
-        "rol": "admin"
-      }
-    ],
-    "camiones": [
-      {
-        "id": 1,
-        "matricula": "ABC123",
-        "capacidadCargaKg": 10000,
-        "consumoGasolinaGalonesPorKm": 0.3,
-        "cargaActualKg": 5000
-      },
-      {
-        "id": 2,
-        "matricula": "DEF456",
-        "capacidadCargaKg": 15000,
-        "consumoGasolinaGalonesPorKm": 0.35,
-        "cargaActualKg": 8000
-      }
-    ]
-  }
-  
+  "administrador": [
+    {
+      "id": "1",
+      "nombre": "Admin1",
+      "correo": "admin1@example.com",
+      "contraseña": "password123",
+      "rol": "superadmin"
+    },
+    {
+      "id": "2",
+      "nombre": "Admin2",
+      "correo": "admin2@example.com",
+      "contraseña": "password456",
+      "rol": "admin"
+    },
+    {
+      "id": 1723583127635,
+      "nombre": "Andres",
+      "correo": "afcadena022@gmail.com",
+      "contraseña": "123456",
+      "rol": "admin"
+    }
+  ],
+  "camiones": [
+    {
+      "id": 1723584669165,
+      "matricula": "FGR456",
+      "capacidadCargaKg": 10000,
+      "consumoGasolinaGalonesPorKm": 0.54,
+      "cargaActualKg": 4972
+    },
+    {
+      "id": 1723585174988,
+      "matricula": "ABC",
+      "capacidadCargaKg": 12000,
+      "consumoGasolinaGalonesPorKm": 0.4,
+      "cargaActualKg": 240
+    }
+  ]
+}

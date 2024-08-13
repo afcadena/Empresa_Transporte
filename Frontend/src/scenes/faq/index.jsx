@@ -1,84 +1,198 @@
-import { Box, useTheme } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Box, useTheme, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
 import Header from "../../components/Header";
-import Accordion from "@mui/material/Accordion";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import Typography from "@mui/material/Typography";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { tokens } from "../../Theme";
+import axios from "axios";
 
 const FAQ = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const [camiones, setCamiones] = useState([]);
+  const [selectedCamion, setSelectedCamion] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [camionToDelete, setCamionToDelete] = useState(null);
+
+  useEffect(() => {
+    axios.get("http://localhost:3001/camiones")
+      .then((response) => {
+        setCamiones(response.data);
+      })
+      .catch((error) => {
+        console.error("Error al obtener los camiones:", error);
+      });
+  }, []);
+
+  const handleClickOpen = (camion) => {
+    setSelectedCamion(camion);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedCamion(null);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setSelectedCamion((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSave = () => {
+    if (!selectedCamion || !selectedCamion.id) {
+      console.error("Error: El camión seleccionado no tiene un ID válido.");
+      return;
+    }
+  
+    console.log("Enviando solicitud PUT a:", `http://localhost:3001/camiones/${selectedCamion.id}`);
+    console.log("Datos enviados:", selectedCamion);
+  
+    axios.put(`http://localhost:3001/camiones/${selectedCamion.id}`, selectedCamion)
+      .then((response) => {
+        setCamiones((prev) => prev.map((camion) => 
+          camion.id === selectedCamion.id ? response.data : camion
+        ));
+        handleClose();
+      })
+      .catch((error) => {
+        console.error("Error al guardar los cambios:", error);
+      });
+  };
+  const handleDeleteConfirmation = (camion) => {
+    setCamionToDelete(camion);
+    setConfirmOpen(true);
+  };
+
+  const handleConfirmClose = () => {
+    setConfirmOpen(false);
+    setCamionToDelete(null);
+  };
+
+  const handleDelete = () => {
+    axios.delete(`http://localhost:3001/camiones/${camionToDelete.id}`)
+      .then(() => {
+        setCamiones((prev) => prev.filter((camion) => camion.id !== camionToDelete.id));
+        handleConfirmClose();
+      })
+      .catch((error) => {
+        console.error("Error al eliminar el camión:", error);
+      });
+  };
+
   return (
     <Box m="20px">
-      <Header title="FAQ" subtitle="Frequently Asked Questions Page" />
+      <Header title="Camiones" subtitle="Lista de todos los camiones registrados" />
 
-      <Accordion defaultExpanded>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography color={colors.greenAccent[500]} variant="h5">
-            An Important Question
-          </Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Typography>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            malesuada lacus ex, sit amet blandit leo lobortis eget.
-          </Typography>
-        </AccordionDetails>
-      </Accordion>
-      <Accordion defaultExpanded>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography color={colors.greenAccent[500]} variant="h5">
-            Another Important Question
-          </Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Typography>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            malesuada lacus ex, sit amet blandit leo lobortis eget.
-          </Typography>
-        </AccordionDetails>
-      </Accordion>
-      <Accordion defaultExpanded>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography color={colors.greenAccent[500]} variant="h5">
-            Your Favorite Question
-          </Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Typography>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            malesuada lacus ex, sit amet blandit leo lobortis eget.
-          </Typography>
-        </AccordionDetails>
-      </Accordion>
-      <Accordion defaultExpanded>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography color={colors.greenAccent[500]} variant="h5">
-            Some Random Question
-          </Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Typography>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            malesuada lacus ex, sit amet blandit leo lobortis eget.
-          </Typography>
-        </AccordionDetails>
-      </Accordion>
-      <Accordion defaultExpanded>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography color={colors.greenAccent[500]} variant="h5">
-            The Final Question
-          </Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Typography>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            malesuada lacus ex, sit amet blandit leo lobortis eget.
-          </Typography>
-        </AccordionDetails>
-      </Accordion>
+      <TableContainer component={Paper} sx={{ mt: 4 }}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell style={{ color: colors.greenAccent[500] }}>Matrícula</TableCell>
+              <TableCell style={{ color: colors.greenAccent[500] }}>Capacidad de Carga (Kg)</TableCell>
+              <TableCell style={{ color: colors.greenAccent[500] }}>Consumo de Gasolina (Galones/Km)</TableCell>
+              <TableCell style={{ color: colors.greenAccent[500] }}>Carga Actual (Kg)</TableCell>
+              <TableCell style={{ color: colors.greenAccent[500] }}>Acciones</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {camiones.map((camion) => (
+              <TableRow key={camion.id}>
+                <TableCell>{camion.matricula}</TableCell>
+                <TableCell>{camion.capacidadCargaKg}</TableCell>
+                <TableCell>{camion.consumoGasolinaGalonesPorKm}</TableCell>
+                <TableCell>{camion.cargaActualKg}</TableCell>
+                <TableCell>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => handleClickOpen(camion)}
+                    sx={{ marginRight: "10px" }}
+                  >
+                    Editar
+                  </Button>
+                  <Button
+                    variant="contained"
+                    sx={{ backgroundColor: "#E52647", color: "#fff" }}
+                    onClick={() => handleDeleteConfirmation(camion)}
+                  >
+                    Eliminar
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Editar Camión</DialogTitle>
+        <DialogContent>
+          <TextField
+            margin="dense"
+            label="Matrícula"
+            type="text"
+            fullWidth
+            name="matricula"
+            value={selectedCamion?.matricula || ''}
+            onChange={handleChange}
+          />
+          <TextField
+            margin="dense"
+            label="Capacidad de Carga (Kg)"
+            type="number"
+            fullWidth
+            name="capacidadCargaKg"
+            value={selectedCamion?.capacidadCargaKg || ''}
+            onChange={handleChange}
+          />
+          <TextField
+            margin="dense"
+            label="Consumo de Gasolina (Galones/Km)"
+            type="number"
+            fullWidth
+            name="consumoGasolinaGalonesPorKm"
+            value={selectedCamion?.consumoGasolinaGalonesPorKm || ''}
+            onChange={handleChange}
+          />
+          <TextField
+            margin="dense"
+            label="Carga Actual (Kg)"
+            type="number"
+            fullWidth
+            name="cargaActualKg"
+            value={selectedCamion?.cargaActualKg || ''}
+            onChange={handleChange}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancelar
+          </Button>
+          <Button onClick={handleSave} color="primary">
+            Guardar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={confirmOpen} onClose={handleConfirmClose}>
+        <DialogTitle>Confirmar eliminación</DialogTitle>
+        <DialogContent>
+          <Box>
+            ¿Estás seguro de que deseas eliminar el camión con matrícula {camionToDelete?.matricula}?
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleConfirmClose} color="primary">
+            No
+          </Button>
+          <Button onClick={handleDelete} sx={{ backgroundColor: "#E52647", color: "#fff" }}>
+            Sí, eliminar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

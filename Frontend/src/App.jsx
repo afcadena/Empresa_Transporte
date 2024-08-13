@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { ColorModeContext, useMode } from "./Theme";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { Routes, Route, useNavigate } from "react-router-dom";
-import Topbar from "./scenes/global/Topbar";
+
 import Sidebar from "./scenes/global/Sidebar";
 import FAQ from "./scenes/faq";
 import Calendar from "./scenes/calendar/calendar";
@@ -34,7 +34,6 @@ function App() {
                 <>
                   <Sidebar />
                   <main className="content">
-                    <Topbar />
                     <Routes>
                       <Route path="/faq" element={<FAQ />} />
                       <Route path="/calendar" element={<Calendar />} />

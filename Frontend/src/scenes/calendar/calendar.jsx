@@ -4,7 +4,6 @@ import { formatDate } from '@fullcalendar/core';
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { Draggable } from '@fullcalendar/interaction';
 import listPlugin from "@fullcalendar/list";
 import {
   Box,
@@ -23,7 +22,7 @@ const Calendar = () => {
   const [currentEvents, setCurrentEvents] = useState([]);
 
   const handleDateClick = (selected) => {
-    const title = prompt("Please enter a new title for your event");
+    const title = prompt("Ingrese un título para el siguiente encargo");
     const calendarApi = selected.view.calendar;
     calendarApi.unselect();
 
@@ -50,7 +49,7 @@ const Calendar = () => {
 
   return (
     <Box m="20px">
-      <Header title="Calendar" subtitle="Full Calendar Interactive Page" />
+      <Header title="Calendario" subtitle="Calendario de cargas y descargas de camiones" />
 
       <Box display="flex" justifyContent="space-between">
         {/* CALENDAR SIDEBAR */}
@@ -60,7 +59,7 @@ const Calendar = () => {
           p="15px"
           borderRadius="4px"
         >
-          <Typography variant="h5">Events</Typography>
+          <Typography variant="h5">Eventos</Typography>
           <List>
             {currentEvents.map((event) => (
               <ListItem

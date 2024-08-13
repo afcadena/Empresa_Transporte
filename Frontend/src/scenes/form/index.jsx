@@ -1,19 +1,32 @@
+import React from "react";
 import { Box, Button, TextField } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
+import axios from "axios";
 
 const Form = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
 
-  const handleFormSubmit = (values) => {
-    console.log(values);
+  const handleFormSubmit = (values, { resetForm }) => {
+    axios.post("http://localhost:3001/camiones", {
+      ...values,
+      id: Date.now(), // Agrega un ID único basado en la fecha actual
+    })
+    .then((response) => {
+      console.log("Camión registrado:", response.data);
+      alert('Camión registrado con éxito');
+      resetForm(); // Reinicia el formulario después de un registro exitoso
+    })
+    .catch((error) => {
+      console.error("Error al registrar el camión:", error);
+    });
   };
 
   return (
     <Box m="20px">
-      <Header title="CREATE USER" subtitle="Create a New User Profile" />
+      <Header title="REGISTRAR CAMIÓN" subtitle="Registrar un nuevo camión" />
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -41,84 +54,58 @@ const Form = () => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label="First Name"
+                label="Matrícula"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.firstName}
-                name="firstName"
-                error={!!touched.firstName && !!errors.firstName}
-                helperText={touched.firstName && errors.firstName}
-                sx={{ gridColumn: "span 2" }}
-              />
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label="Last Name"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.lastName}
-                name="lastName"
-                error={!!touched.lastName && !!errors.lastName}
-                helperText={touched.lastName && errors.lastName}
-                sx={{ gridColumn: "span 2" }}
-              />
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label="Email"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.email}
-                name="email"
-                error={!!touched.email && !!errors.email}
-                helperText={touched.email && errors.email}
+                value={values.matricula}
+                name="matricula"
+                error={!!touched.matricula && !!errors.matricula}
+                helperText={touched.matricula && errors.matricula}
                 sx={{ gridColumn: "span 4" }}
               />
               <TextField
                 fullWidth
                 variant="filled"
-                type="text"
-                label="Contact Number"
+                type="number"
+                label="Capacidad de Carga (Kg)"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.contact}
-                name="contact"
-                error={!!touched.contact && !!errors.contact}
-                helperText={touched.contact && errors.contact}
+                value={values.capacidadCargaKg}
+                name="capacidadCargaKg"
+                error={!!touched.capacidadCargaKg && !!errors.capacidadCargaKg}
+                helperText={touched.capacidadCargaKg && errors.capacidadCargaKg}
                 sx={{ gridColumn: "span 4" }}
               />
               <TextField
                 fullWidth
                 variant="filled"
-                type="text"
-                label="Address 1"
+                type="number"
+                label="Consumo de Gasolina (Galones/Km)"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.address1}
-                name="address1"
-                error={!!touched.address1 && !!errors.address1}
-                helperText={touched.address1 && errors.address1}
+                value={values.consumoGasolinaGalonesPorKm}
+                name="consumoGasolinaGalonesPorKm"
+                error={!!touched.consumoGasolinaGalonesPorKm && !!errors.consumoGasolinaGalonesPorKm}
+                helperText={touched.consumoGasolinaGalonesPorKm && errors.consumoGasolinaGalonesPorKm}
                 sx={{ gridColumn: "span 4" }}
               />
               <TextField
                 fullWidth
                 variant="filled"
-                type="text"
-                label="Address 2"
+                type="number"
+                label="Carga Actual (Kg)"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.address2}
-                name="address2"
-                error={!!touched.address2 && !!errors.address2}
-                helperText={touched.address2 && errors.address2}
+                value={values.cargaActualKg}
+                name="cargaActualKg"
+                error={!!touched.cargaActualKg && !!errors.cargaActualKg}
+                helperText={touched.cargaActualKg && errors.cargaActualKg}
                 sx={{ gridColumn: "span 4" }}
               />
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
               <Button type="submit" color="secondary" variant="contained">
-                Create New User
+                Registrar Camión
               </Button>
             </Box>
           </form>
@@ -128,27 +115,30 @@ const Form = () => {
   );
 };
 
-const phoneRegExp =
-  /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
-
+// Esquema de validación con Yup
 const checkoutSchema = yup.object().shape({
-  firstName: yup.string().required("required"),
-  lastName: yup.string().required("required"),
-  email: yup.string().email("invalid email").required("required"),
-  contact: yup
-    .string()
-    .matches(phoneRegExp, "Phone number is not valid")
-    .required("required"),
-  address1: yup.string().required("required"),
-  address2: yup.string().required("required"),
+  matricula: yup.string().required("La matrícula es obligatoria"),
+  capacidadCargaKg: yup
+    .number()
+    .required("La capacidad de carga es obligatoria")
+    .min(1, "La capacidad debe ser mayor a 0"),
+  consumoGasolinaGalonesPorKm: yup
+    .number()
+    .required("El consumo de gasolina es obligatorio")
+    .min(0, "El consumo no puede ser negativo"),
+  cargaActualKg: yup
+    .number()
+    .required("La carga actual es obligatoria")
+    .min(0, "La carga actual no puede ser negativa")
+    .max(yup.ref('capacidadCargaKg'), "La carga actual no puede exceder la capacidad máxima"),
 });
+
+// Valores iniciales del formulario
 const initialValues = {
-  firstName: "",
-  lastName: "",
-  email: "",
-  contact: "",
-  address1: "",
-  address2: "",
+  matricula: "",
+  capacidadCargaKg: "",
+  consumoGasolinaGalonesPorKm: "",
+  cargaActualKg: "",
 };
 
 export default Form;
