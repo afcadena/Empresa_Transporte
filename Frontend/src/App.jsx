@@ -14,10 +14,10 @@ function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const hasVisited = localStorage.getItem("hasVisited");
-    if (!hasVisited) {
-      localStorage.setItem("hasVisited", "true");
-      navigate("/Login_register");
+    const isLoggedIn = localStorage.getItem('loggedIn');
+    if (!isLoggedIn) {
+      // Si no está autenticado, redirigir a la página de login
+      navigate("/login_register");
     }
   }, [navigate]);
 

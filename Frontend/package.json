@@ -22,7 +22,9 @@
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.2.0",
     "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.7.3",
     "formik": "^2.4.6",
+    "json-server": "^1.0.0-beta.1",
     "loginform": "file:",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -34,6 +36,7 @@
     "yup": "^1.4.0"
   },
   "scripts": {
+    "start:api": "json-server --watch src/app/DB/db.json --port 3001",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

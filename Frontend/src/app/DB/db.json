@@ -1,0 +1,35 @@
+{
+    "administrador": [
+      {
+        "id": 1,
+        "nombre": "Admin1",
+        "correo": "admin1@example.com",
+        "contraseña": "password123",
+        "rol": "superadmin"
+      },
+      {
+        "id": 2,
+        "nombre": "Admin2",
+        "correo": "admin2@example.com",
+        "contraseña": "password456",
+        "rol": "admin"
+      }
+    ],
+    "camiones": [
+      {
+        "id": 1,
+        "matricula": "ABC123",
+        "capacidadCargaKg": 10000,
+        "consumoGasolinaGalonesPorKm": 0.3,
+        "cargaActualKg": 5000
+      },
+      {
+        "id": 2,
+        "matricula": "DEF456",
+        "capacidadCargaKg": 15000,
+        "consumoGasolinaGalonesPorKm": 0.35,
+        "cargaActualKg": 8000
+      }
+    ]
+  }
+  
