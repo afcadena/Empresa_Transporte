@@ -15,7 +15,7 @@
       "rol": "admin"
     },
     {
-      "id": 1723583127635,
+      "id": "1723583127635",
       "nombre": "Andres",
       "correo": "afcadena022@gmail.com",
       "contraseña": "123456",
@@ -24,15 +24,15 @@
   ],
   "camiones": [
     {
-      "id": 1723584669165,
+      "id": "1723584669165",
       "matricula": "FGR456",
       "capacidadCargaKg": 10000,
       "consumoGasolinaGalonesPorKm": 0.54,
       "cargaActualKg": 4972
     },
     {
-      "id": 1723585174988,
-      "matricula": "ABC",
+      "id": "1723585174988",
+      "matricula": "ABC123",
       "capacidadCargaKg": 12000,
       "consumoGasolinaGalonesPorKm": 0.4,
       "cargaActualKg": 240

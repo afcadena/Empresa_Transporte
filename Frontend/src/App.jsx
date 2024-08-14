@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { ColorModeContext, useMode } from "./Theme";
 import { CssBaseline, ThemeProvider } from "@mui/material";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
 
 import Sidebar from "./scenes/global/Sidebar";
 import FAQ from "./scenes/faq";
@@ -16,7 +16,6 @@ function App() {
   useEffect(() => {
     const isLoggedIn = localStorage.getItem('loggedIn');
     if (!isLoggedIn) {
-      // Si no está autenticado, redirigir a la página de login
       navigate("/login_register");
     }
   }, [navigate]);
@@ -27,21 +26,33 @@ function App() {
         <CssBaseline />
         <div className="app">
           <Routes>
+            {/* Ruta predeterminada redirige a login si no está autenticado */}
+            <Route 
+              path="/" 
+              element={<Navigate to="/login_register" replace />} 
+            />
+
+            {/* Ruta del login */}
             <Route path="/login_register" element={<LoginRegister />} />
+            
+            {/* Rutas protegidas */}
             <Route
               path="/*"
               element={
-                <>
-                  <Sidebar />
-                  <main className="content">
-                    <Routes>
-                      <Route path="/faq" element={<FAQ />} />
-                      <Route path="/calendar" element={<Calendar />} />
-                      <Route path="/form" element={<Form />} />
-                      <Route path="/" element={<Form />} />
-                    </Routes>
-                  </main>
-                </>
+                localStorage.getItem('loggedIn') ? (
+                  <>
+                    <Sidebar />
+                    <main className="content">
+                      <Routes>
+                        <Route path="/faq" element={<FAQ />} />
+                        <Route path="/calendar" element={<Calendar />} />
+                        <Route path="/form" element={<Form />} />
+                      </Routes>
+                    </main>
+                  </>
+                ) : (
+                  <Navigate to="/login_register" />
+                )
               }
             />
           </Routes>

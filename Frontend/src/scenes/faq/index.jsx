@@ -49,9 +49,10 @@ const FAQ = () => {
   
     console.log("Enviando solicitud PUT a:", `http://localhost:3001/camiones/${selectedCamion.id}`);
     console.log("Datos enviados:", selectedCamion);
-  
+
     axios.put(`http://localhost:3001/camiones/${selectedCamion.id}`, selectedCamion)
       .then((response) => {
+        console.log("Respuesta de la API:", response.data);
         setCamiones((prev) => prev.map((camion) => 
           camion.id === selectedCamion.id ? response.data : camion
         ));
@@ -59,8 +60,12 @@ const FAQ = () => {
       })
       .catch((error) => {
         console.error("Error al guardar los cambios:", error);
+        if (error.response) {
+          console.error("Datos de error:", error.response.data);
+        }
       });
   };
+
   const handleDeleteConfirmation = (camion) => {
     setCamionToDelete(camion);
     setConfirmOpen(true);
