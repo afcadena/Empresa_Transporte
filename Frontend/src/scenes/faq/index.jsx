@@ -46,13 +46,9 @@ const FAQ = () => {
       console.error("Error: El camión seleccionado no tiene un ID válido.");
       return;
     }
-  
-    console.log("Enviando solicitud PUT a:", `http://localhost:3001/camiones/${selectedCamion.id}`);
-    console.log("Datos enviados:", selectedCamion);
 
     axios.put(`http://localhost:3001/camiones/${selectedCamion.id}`, selectedCamion)
       .then((response) => {
-        console.log("Respuesta de la API:", response.data);
         setCamiones((prev) => prev.map((camion) => 
           camion.id === selectedCamion.id ? response.data : camion
         ));
@@ -99,6 +95,8 @@ const FAQ = () => {
               <TableCell style={{ color: colors.greenAccent[500] }}>Capacidad de Carga (Kg)</TableCell>
               <TableCell style={{ color: colors.greenAccent[500] }}>Consumo de Gasolina (Galones/Km)</TableCell>
               <TableCell style={{ color: colors.greenAccent[500] }}>Carga Actual (Kg)</TableCell>
+              <TableCell style={{ color: colors.greenAccent[500] }}>Conductor</TableCell>
+              <TableCell style={{ color: colors.greenAccent[500] }}>Correo del Conductor</TableCell>
               <TableCell style={{ color: colors.greenAccent[500] }}>Acciones</TableCell>
             </TableRow>
           </TableHead>
@@ -109,6 +107,8 @@ const FAQ = () => {
                 <TableCell>{camion.capacidadCargaKg}</TableCell>
                 <TableCell>{camion.consumoGasolinaGalonesPorKm}</TableCell>
                 <TableCell>{camion.cargaActualKg}</TableCell>
+                <TableCell>{camion.conductor}</TableCell>
+                <TableCell>{camion.correo}</TableCell>
                 <TableCell>
                   <Button
                     variant="contained"
@@ -142,7 +142,9 @@ const FAQ = () => {
             fullWidth
             name="matricula"
             value={selectedCamion?.matricula || ''}
-            onChange={handleChange}
+            InputProps={{
+              readOnly: true,
+            }} // Campo no editable
           />
           <TextField
             margin="dense"
@@ -169,6 +171,26 @@ const FAQ = () => {
             fullWidth
             name="cargaActualKg"
             value={selectedCamion?.cargaActualKg || ''}
+            InputProps={{
+              readOnly: true,
+            }} // Campo no editable
+          />
+          <TextField
+            margin="dense"
+            label="Conductor"
+            type="text"
+            fullWidth
+            name="conductor"
+            value={selectedCamion?.conductor || ''}
+            onChange={handleChange}
+          />
+          <TextField
+            margin="dense"
+            label="Correo del Conductor"
+            type="email"
+            fullWidth
+            name="correo"
+            value={selectedCamion?.correo || ''}
             onChange={handleChange}
           />
         </DialogContent>

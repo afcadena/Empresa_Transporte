@@ -26,16 +26,46 @@
     {
       "id": "1723584669165",
       "matricula": "FGR456",
-      "capacidadCargaKg": 10000,
-      "consumoGasolinaGalonesPorKm": 0.54,
-      "cargaActualKg": 4972
+      "capacidadCargaKg": "100",
+      "consumoGasolinaGalonesPorKm": "0.6",
+      "cargaActualKg": 0,
+      "conductor": "Carlos",
+      "correo": "carlos@test.com",
+      "contraseña": "123456789",
+      "rol": "conductor"
     },
     {
       "id": "1723585174988",
-      "matricula": "ABC123",
+      "matricula": "ABC125",
       "capacidadCargaKg": 12000,
       "consumoGasolinaGalonesPorKm": 0.4,
-      "cargaActualKg": 240
+      "cargaActualKg": 0,
+      "conductor": "Juan",
+      "correo": "juan@test.com",
+      "contraseña": "987654321",
+      "rol": "conductor"
+    },
+    {
+      "id": "1723637794063",
+      "matricula": "DFE265",
+      "capacidadCargaKg": 50,
+      "consumoGasolinaGalonesPorKm": 0.4,
+      "cargaActualKg": 30,
+      "conductor": "Pedro",
+      "correo": "pedro@test.com",
+      "contraseña": "abcdefg",
+      "rol": "conductor"
+    },
+    {
+      "id": "1723637818592",
+      "matricula": "RBS479",
+      "capacidadCargaKg": 300,
+      "consumoGasolinaGalonesPorKm": 0.6,
+      "cargaActualKg": 0,
+      "conductor": "Luis",
+      "correo": "luis@test.com",
+      "contraseña": "test1",
+      "rol": "conductor"
     }
   ]
 }

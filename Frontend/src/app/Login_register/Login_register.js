@@ -4,7 +4,7 @@ import axios from 'axios';
 
 function Login_register() {
   const [signIn, setSignIn] = useState(true);
-  const [formData, setFormData] = useState({ nombre: '', correo: '', contraseña: '' });
+  const [formData, setFormData] = useState({ nombre: '', correo: '', contraseña: '', rol: 'admin' });
   const [loginError, setLoginError] = useState('');
 
   const toggle = (isSignIn) => {
@@ -22,10 +22,10 @@ function Login_register() {
 
   const registerUser = async () => {
     try {
-      const response = await axios.post('http://localhost:3001/administrador', {
+      const endpoint = formData.rol === 'conductor' ? 'camiones' : 'administrador';
+      await axios.post(`http://localhost:3001/${endpoint}`, {
         ...formData,
         id: Date.now(),
-        rol: 'admin',
       });
       alert('Usuario registrado con éxito');
       toggle(true);
@@ -43,14 +43,27 @@ function Login_register() {
         return;
       }
 
-      const response = await axios.get(`http://localhost:3001/administrador?correo=${correo}`);
-      const user = response.data.find((u) => u.correo === correo);
+      // Buscar en la tabla de administradores
+      const adminRes = await axios.get(`http://localhost:3001/administrador?correo=${correo}`);
+      const admin = adminRes.data.find((u) => u.correo === correo && u.contraseña === contraseña);
 
-      if (user && user.contraseña === contraseña) {
-        alert('Inicio de sesión exitoso como Administrador');
+      // Buscar en la tabla de camiones para encontrar conductores
+      const conductorRes = await axios.get(`http://localhost:3001/camiones?correo=${correo}`);
+      const conductor = conductorRes.data.find((u) => u.correo === correo && u.contraseña === contraseña);
+
+      // Validar si el usuario es un administrador o conductor
+      const user = admin || conductor;
+
+      if (user) {
+        alert(`Inicio de sesión exitoso como ${user.rol}`);
         localStorage.setItem('loggedIn', 'true');
         localStorage.setItem('userRole', user.rol);
-        window.location.href = '/form'; // Redirige al formulario
+        localStorage.setItem('userEmail', user.correo);
+        if (user.rol === 'admin' || user.rol === 'superadmin') {
+          window.location.href = '/form';
+        } else if (user.rol === 'conductor') {
+          window.location.href = '/mi_camion'; // Cambiar a la ruta principal para conductores
+        }
       } else {
         setLoginError('Correo o contraseña incorrectos.');
       }
@@ -95,6 +108,15 @@ function Login_register() {
             value={formData.contraseña}
             onChange={handleInputChange}
           />
+          <select
+            name='rol'
+            value={formData.rol}
+            onChange={handleInputChange}
+            style={{ padding: '10px', marginTop: '10px', borderRadius: '4px', width: '100%' }}
+          >
+            <option value='admin'>Administrador</option>
+            <option value='conductor'>Conductor</option>
+          </select>
           <Components.Button type='submit'>Crear cuenta</Components.Button>
         </Components.Form>
       </Components.SignUpContainer>

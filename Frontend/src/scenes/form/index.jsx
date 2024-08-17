@@ -26,7 +26,7 @@ const Form = () => {
 
   return (
     <Box m="20px">
-      <Header title="REGISTRAR CAMIÓN" subtitle="Registrar un nuevo camión" />
+      <Header title="REGISTRAR CAMIÓN" subtitle="Registrar un nuevo camión con los datos del conductor" />
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -102,6 +102,45 @@ const Form = () => {
                 helperText={touched.cargaActualKg && errors.cargaActualKg}
                 sx={{ gridColumn: "span 4" }}
               />
+              <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label="Nombre del Conductor"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.conductor}
+                name="conductor"
+                error={!!touched.conductor && !!errors.conductor}
+                helperText={touched.conductor && errors.conductor}
+                sx={{ gridColumn: "span 4" }}
+              />
+              <TextField
+                fullWidth
+                variant="filled"
+                type="email"
+                label="Correo del Conductor"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.correo}
+                name="correo"
+                error={!!touched.correo && !!errors.correo}
+                helperText={touched.correo && errors.correo}
+                sx={{ gridColumn: "span 4" }}
+              />
+              <TextField
+                fullWidth
+                variant="filled"
+                type="password"
+                label="Contraseña del Conductor"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.contraseña}
+                name="contraseña"
+                error={!!touched.contraseña && !!errors.contraseña}
+                helperText={touched.contraseña && errors.contraseña}
+                sx={{ gridColumn: "span 4" }}
+              />
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
               <Button type="submit" color="secondary" variant="contained">
@@ -131,6 +170,9 @@ const checkoutSchema = yup.object().shape({
     .required("La carga actual es obligatoria")
     .min(0, "La carga actual no puede ser negativa")
     .max(yup.ref('capacidadCargaKg'), "La carga actual no puede exceder la capacidad máxima"),
+  conductor: yup.string().required("El nombre del conductor es obligatorio"),
+  correo: yup.string().email("El correo es inválido").required("El correo es obligatorio"),
+  contraseña: yup.string().required("La contraseña es obligatoria").min(6, "La contraseña debe tener al menos 6 caracteres"),
 });
 
 // Valores iniciales del formulario
@@ -139,6 +181,9 @@ const initialValues = {
   capacidadCargaKg: "",
   consumoGasolinaGalonesPorKm: "",
   cargaActualKg: "",
+  conductor: "",
+  correo: "",
+  contraseña: "",
 };
 
 export default Form;

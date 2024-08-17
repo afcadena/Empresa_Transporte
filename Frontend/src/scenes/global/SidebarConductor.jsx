@@ -5,9 +5,7 @@ import { useNavigate } from "react-router-dom"; // Usar useNavigate para redirec
 import { tokens } from "../../Theme";
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus'; // Icono para Camiones
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
-import DashboardIcon from '@mui/icons-material/Dashboard'; // Icono para Dashboard
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import AddBoxIcon from '@mui/icons-material/AddBox'; // Importa el nuevo icono
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const navigate = useNavigate();
@@ -30,11 +28,11 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
   );
 };
 
-const SidebarComponent = () => {
+const SidebarConductor = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [selected, setSelected] = useState("Camiones");
+  const [selected, setSelected] = useState("Mi Camión");
   const [userName, setUserName] = useState("");
 
   useEffect(() => {
@@ -103,7 +101,7 @@ const SidebarComponent = () => {
                   {userName}
                 </Typography>
                 <Typography variant="h5" color="#1F2A40">
-                  Administrador
+                  Conductor
                 </Typography>
               </Box>
             </Box>
@@ -118,30 +116,16 @@ const SidebarComponent = () => {
               Pages
             </Typography>
             <Item
-              title="Camiones"
-              to="/form"
+              title="Mi Camión"
+              to="/mi_camion"
               icon={<DirectionsBusIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="Calendar"
+              title="Calendario"
               to="/calendar"
               icon={<CalendarTodayOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Consultas"
-              to="/faq"
-              icon={<DashboardIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Cargar Camión"  
-              to="/cargar_camion"
-              icon={<AddBoxIcon />} 
               selected={selected}
               setSelected={setSelected}
             />
@@ -152,4 +136,4 @@ const SidebarComponent = () => {
   );
 };
 
-export default SidebarComponent;
+export default SidebarConductor;
