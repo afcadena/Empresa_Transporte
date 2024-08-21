@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Sidebar as ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
-import { useNavigate } from "react-router-dom"; // Usar useNavigate para redirección
+import { useNavigate } from "react-router-dom";
 import { tokens } from "../../Theme";
-import DirectionsBusIcon from '@mui/icons-material/DirectionsBus'; // Icono para Camiones
+import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
@@ -20,7 +20,7 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
       }}
       onClick={() => {
         setSelected(title);
-        navigate(to); // Redirige a la ruta
+        navigate(to);
       }}
       icon={React.cloneElement(icon, { style: { color: '#1F2A40' } })}
     >
@@ -35,12 +35,19 @@ const SidebarConductor = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Mi Camión");
   const [userName, setUserName] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Obtener el nombre o correo del usuario desde localStorage (o de cualquier otro lugar)
     const loggedInUser = localStorage.getItem("userEmail") || "Usuario";
     setUserName(loggedInUser);
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('authToken'); // Ajusta según tu método de autenticación
+    localStorage.removeItem('userEmail');
+    alert('Sesión cerrada correctamente'); // Muestra una ventana emergente
+    navigate('/login_register'); // Redirige al usuario a la página de login
+  };
 
   return (
     <Box
@@ -81,7 +88,7 @@ const SidebarConductor = () => {
                 background={colors.primary[400]}
               >
                 <Typography variant="h3" color="#1F2A40">
-                 EmpreTrans
+                  EmpreTrans
                 </Typography>
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                   <MenuOutlinedIcon style={{ color: '#1F2A40' }} />
@@ -130,6 +137,16 @@ const SidebarConductor = () => {
               selected={selected}
               setSelected={setSelected}
             />
+            <MenuItem
+              onClick={handleLogout}
+              style={{
+                color: '#1F2A40',
+                marginTop: 'auto',
+              }}
+              icon={<ExitToAppIcon style={{ color: '#1F2A40' }} />}
+            >
+              <Typography color="#1F2A40">Logout</Typography>
+            </MenuItem>
           </Box>
         </Menu>
       </ProSidebar>

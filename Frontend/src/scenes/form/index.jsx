@@ -26,7 +26,7 @@ const Form = () => {
 
   return (
     <Box m="20px">
-      <Header title="REGISTRAR CAMIÓN" subtitle="Registrar un nuevo camión con los datos del conductor" />
+      <Header title="REGISTRAR CAMIÓN" subtitle="Registrar un nuevo camión y conductor" />
 
       <Formik
         onSubmit={handleFormSubmit}

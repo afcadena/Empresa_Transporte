@@ -6,9 +6,11 @@ import axios from "axios";
 const CargarCamion = () => {
   const [camiones, setCamiones] = useState([]);
   const [selectedCamion, setSelectedCamion] = useState(null);
-  const [openSelectCamion, setOpenSelectCamion] = useState(true); // Dialogo de selección de camión
-  const [openSetCarga, setOpenSetCarga] = useState(false); // Dialogo de entrada de carga
+  const [openSelectCamion, setOpenSelectCamion] = useState(true); // Diálogo de selección de camión
+  const [openSetCarga, setOpenSetCarga] = useState(false); // Diálogo de entrada de carga
+  const [openConfirmDownload, setOpenConfirmDownload] = useState(false); // Diálogo de confirmación de descarga
   const [carga, setCarga] = useState("");
+  const [camionToReset, setCamionToReset] = useState(null); // Camión que se desea restablecer
 
   useEffect(() => {
     axios.get("http://localhost:3001/camiones")
@@ -52,6 +54,35 @@ const CargarCamion = () => {
       });
   };
 
+  const handleResetCarga = (camion) => {
+    setCamionToReset(camion);
+    setOpenConfirmDownload(true);
+  };
+
+  const confirmResetCarga = () => {
+    const camionReset = {
+      ...camionToReset,
+      cargaActualKg: 0, // Restablecer la carga a cero
+    };
+
+    axios.put(`http://localhost:3001/camiones/${camionToReset.id}`, camionReset)
+      .then(() => {
+        setCamiones((prev) => prev.map((c) =>
+          c.id === camionToReset.id ? camionReset : c
+        ));
+        setOpenConfirmDownload(false);
+        setCamionToReset(null);
+      })
+      .catch((error) => {
+        console.error("Error al restablecer la carga:", error);
+      });
+  };
+
+  const cancelResetCarga = () => {
+    setOpenConfirmDownload(false);
+    setCamionToReset(null);
+  };
+
   const handleAddCamion = () => {
     setOpenSelectCamion(true);
   };
@@ -62,7 +93,7 @@ const CargarCamion = () => {
 
       <Box display="flex" justifyContent="space-between" alignItems="center" mb="20px">
         <Button variant="contained" color="primary" onClick={handleAddCamion}>
-         Cargar más camiones
+         Cargar camiones
         </Button>
       </Box>
 
@@ -75,6 +106,7 @@ const CargarCamion = () => {
               <TableCell>Carga Actual (Kg)</TableCell>
               <TableCell>Conductor</TableCell>
               <TableCell>Correo del Conductor</TableCell>
+              <TableCell>Acciones</TableCell> {/* Añadido para el botón de descarga */}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -85,6 +117,15 @@ const CargarCamion = () => {
                 <TableCell>{camion.cargaActualKg}</TableCell>
                 <TableCell>{camion.conductor}</TableCell>
                 <TableCell>{camion.correo}</TableCell>
+                <TableCell>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => handleResetCarga(camion)}
+                  >
+                    Descargar
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -149,6 +190,21 @@ const CargarCamion = () => {
           </Button>
           <Button onClick={handleSetCarga} color="primary">
             Guardar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={openConfirmDownload} onClose={cancelResetCarga}>
+        <DialogTitle>Confirmar Descarga</DialogTitle>
+        <DialogContent>
+          ¿Está seguro de que desea descargar este camión?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={cancelResetCarga} color="primary">
+            No
+          </Button>
+          <Button onClick={confirmResetCarga} color="primary">
+            Sí
           </Button>
         </DialogActions>
       </Dialog>

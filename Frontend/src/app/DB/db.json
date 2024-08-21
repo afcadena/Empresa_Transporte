@@ -50,7 +50,7 @@
       "matricula": "DFE265",
       "capacidadCargaKg": 50,
       "consumoGasolinaGalonesPorKm": 0.9,
-      "cargaActualKg": 30,
+      "cargaActualKg": 0,
       "conductor": "Pedro",
       "correo": "pedro@test.com",
       "contraseña": "abcdefg",

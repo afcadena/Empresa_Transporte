@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { Sidebar as ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
-import { Box, IconButton, Typography, useTheme } from "@mui/material";
-import { useNavigate } from "react-router-dom"; // Usar useNavigate para redirección
-import { tokens } from "../../Theme";
-import DirectionsBusIcon from '@mui/icons-material/DirectionsBus'; // Icono para Camiones
-import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
-import DashboardIcon from '@mui/icons-material/Dashboard'; // Icono para Dashboard
-import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import AddBoxIcon from '@mui/icons-material/AddBox'; // Importa el nuevo icono
-import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import React, { useState, useEffect } from 'react';
+import { Sidebar as ProSidebar, Menu, MenuItem } from 'react-pro-sidebar';
+import { Box, IconButton, Typography, useTheme } from '@mui/material';
+import { useNavigate } from 'react-router-dom'; 
+import { tokens } from '../../Theme';
+import DirectionsBusIcon from '@mui/icons-material/DirectionsBus'; 
+import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
+import DashboardIcon from '@mui/icons-material/Dashboard'; 
+import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
+import AddBoxIcon from '@mui/icons-material/AddBox'; 
+import ExitToAppIcon from '@mui/icons-material/ExitToApp'; 
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
       }}
       onClick={() => {
         setSelected(title);
-        navigate(to); // Redirige a la ruta
+        navigate(to); 
       }}
       icon={React.cloneElement(icon, { style: { color: '#1F2A40' } })}
     >
@@ -35,32 +35,42 @@ const SidebarComponent = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [selected, setSelected] = useState("Camiones");
-  const [userName, setUserName] = useState("");
+  const [selected, setSelected] = useState('Camiones');
+  const [userName, setUserName] = useState('');
+  const navigate = useNavigate(); 
 
   useEffect(() => {
-    // Obtener el nombre o correo del usuario desde localStorage (o de cualquier otro lugar)
-    const loggedInUser = localStorage.getItem("userEmail") || "Usuario";
+
+    const loggedInUser = localStorage.getItem('userEmail') || 'Usuario';
     setUserName(loggedInUser);
   }, []);
+
+  const handleLogout = () => {
+    
+    localStorage.removeItem('loggedIn'); 
+    localStorage.removeItem('userRole'); 
+    localStorage.removeItem('userEmail'); 
+    alert('Sesión cerrada correctamente'); 
+    navigate('/login_register'); 
+  };
 
   return (
     <Box
       sx={{
-        "& .pro-sidebar-inner": {
+        '& .pro-sidebar-inner': {
           background: `${colors.primary[400]} !important`,
         },
-        "& .pro-icon-wrapper": {
-          backgroundColor: "transparent!important",
+        '& .pro-icon-wrapper': {
+          backgroundColor: 'transparent!important',
         },
-        "& .pro-inner-item": {
-          padding: "5px 35px 5px 20px!important",
+        '& .pro-inner-item': {
+          padding: '5px 35px 5px 20px!important',
         },
-        "& .pro-inner-item:hover": {
-          color: "#1F2A40!important",
+        '& .pro-inner-item:hover': {
+          color: '#1F2A40!important',
         },
-        "& .pro-menu-item.active": {
-          color: "#1F2A40!important",
+        '& .pro-menu-item.active': {
+          color: '#1F2A40!important',
         },
       }}
     >
@@ -70,7 +80,7 @@ const SidebarComponent = () => {
             onClick={() => setIsCollapsed(!isCollapsed)}
             icon={isCollapsed ? <MenuOutlinedIcon style={{ color: '#1F2A40' }} /> : undefined}
             style={{
-              margin: "10px 0 20px 0",
+              margin: '10px 0 20px 0',
               color: '#1F2A40',
             }}
           >
@@ -83,7 +93,7 @@ const SidebarComponent = () => {
                 background={colors.primary[400]}
               >
                 <Typography variant="h3" color="#1F2A40">
-                 EmpreTrans
+                  EmpreTrans
                 </Typography>
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                   <MenuOutlinedIcon style={{ color: '#1F2A40' }} />
@@ -99,7 +109,7 @@ const SidebarComponent = () => {
                   variant="h2"
                   color="#1F2A40"
                   fontWeight="bold"
-                  sx={{ m: "10px 0 0 0" }}
+                  sx={{ m: '10px 0 0 0' }}
                 >
                   {userName}
                 </Typography>
@@ -110,42 +120,53 @@ const SidebarComponent = () => {
             </Box>
           )}
 
-          <Box paddingLeft={isCollapsed ? undefined : "10%"}>
+          <Box paddingLeft={isCollapsed ? undefined : '10%'}>
             <Typography
               variant="h6"
               color="#1F2A40"
-              sx={{ m: "15px 0 5px 20px" }}
+              sx={{ m: '15px 0 5px 20px' }}
             >
               Pages
             </Typography>
             <Item
-              title="Camiones"
+              title="Nuevo Camión"
               to="/form"
               icon={<DirectionsBusIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="Calendar"
+              title="Calendario"
               to="/calendar"
               icon={<CalendarTodayOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="Consultas"
+              title="Info Camión"
               to="/faq"
               icon={<DashboardIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="Cargar Camión"  
+              title="Estado Camión"  
               to="/cargar_camion"
               icon={<AddBoxIcon />} 
               selected={selected}
               setSelected={setSelected}
             />
+            
+            <MenuItem
+              onClick={handleLogout}
+              style={{
+                color: '#1F2A40',
+                marginTop: 'auto', 
+              }}
+              icon={<ExitToAppIcon style={{ color: '#1F2A40' }} />}
+            >
+              <Typography color="#1F2A40">Logout</Typography>
+            </MenuItem>
           </Box>
         </Menu>
       </ProSidebar>
