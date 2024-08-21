@@ -27,7 +27,7 @@
       "id": "1723584669165",
       "matricula": "FGR456",
       "capacidadCargaKg": "100",
-      "consumoGasolinaGalonesPorKm": "0.6",
+      "consumoGasolinaGalonesPorKm": "0.4",
       "cargaActualKg": 0,
       "conductor": "Carlos",
       "correo": "carlos@test.com",
@@ -37,8 +37,8 @@
     {
       "id": "1723585174988",
       "matricula": "ABC125",
-      "capacidadCargaKg": 12000,
-      "consumoGasolinaGalonesPorKm": 0.4,
+      "capacidadCargaKg": "120",
+      "consumoGasolinaGalonesPorKm": "1.5",
       "cargaActualKg": 0,
       "conductor": "Juan",
       "correo": "juan@test.com",
@@ -49,7 +49,7 @@
       "id": "1723637794063",
       "matricula": "DFE265",
       "capacidadCargaKg": 50,
-      "consumoGasolinaGalonesPorKm": 0.4,
+      "consumoGasolinaGalonesPorKm": 0.9,
       "cargaActualKg": 30,
       "conductor": "Pedro",
       "correo": "pedro@test.com",
@@ -66,6 +66,58 @@
       "correo": "luis@test.com",
       "contraseña": "test1",
       "rol": "conductor"
+    }
+  ],
+  "encargos": [
+    {
+      "id": "1",
+      "carga": 50,
+      "destinacion": "Centro de Distribución A",
+      "camionId": "1723584669165",
+      "conductor": "Carlos",
+      "fecha": "2024-08-21"
+    },
+    {
+      "id": "2",
+      "carga": 90,
+      "destinacion": "Almacén B",
+      "camionId": "1723637818592",
+      "conductor": "Luis",
+      "fecha": "2024-08-22"
+    },
+    {
+      "id": "undefined-FGR456",
+      "carga": "100",
+      "destinacion": "Cauca",
+      "camionId": "1723584669165",
+      "conductor": "Carlos",
+      "start": "2024-08-14"
+    },
+    {
+      "id": "undefined-FGR456",
+      "title": "Encargo de Carlos - 90 Kg",
+      "start": "2024-08-15",
+      "allDay": true,
+      "extendedProps": {
+        "conductor": "Carlos",
+        "camion": "FGR456",
+        "carga": "90",
+        "destinacion": "Cauca",
+        "start": "2024-08-15"
+      }
+    },
+    {
+      "id": "undefined-ABC125",
+      "title": "Encargo de Juan - 115 Kg",
+      "start": "2024-08-16",
+      "allDay": true,
+      "extendedProps": {
+        "conductor": "Juan",
+        "camion": "ABC125",
+        "carga": "115",
+        "destinacion": "Cundai",
+        "start": "2024-08-16"
+      }
     }
   ]
 }

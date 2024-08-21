@@ -6,6 +6,7 @@ import { tokens } from "../../Theme";
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus'; // Icono para Camiones
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const navigate = useNavigate();
@@ -123,8 +124,8 @@ const SidebarConductor = () => {
               setSelected={setSelected}
             />
             <Item
-              title="Calendario"
-              to="/calendar"
+              title="Entregas"
+              to="/entregas"
               icon={<CalendarTodayOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}

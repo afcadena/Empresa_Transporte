@@ -7,6 +7,7 @@ import Sidebar from "./scenes/global/Sidebar";
 import SidebarConductor from "./scenes/global/SidebarConductor";  // Importa el SidebarConductor
 import FAQ from "./scenes/faq";
 import Calendar from "./scenes/calendar/calendar";
+import Entregas from "./scenes/calendar/entregas";
 import Form from "./scenes/form";
 import LoginRegister from "./app/Login_register/Login_register";
 import CargarCamion from "./scenes/cargarCamion/index";  // Importa el nuevo componente
@@ -49,7 +50,7 @@ function App() {
                       <main className="content">
                         <Routes>
                           <Route path="/mi_camion" element={<MiCamion />} /> {/* Ruta para ver información del camión */}
-                          <Route path="/calendar" element={<Calendar />} />
+                          <Route path="/entregas" element={<Entregas />} />
 
                         </Routes>
                       </main>

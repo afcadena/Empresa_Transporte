@@ -24,6 +24,7 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.7.3",
     "formik": "^2.4.6",
+    "google-map-react": "^2.2.1",
     "json-server": "^1.0.0-beta.1",
     "loginform": "file:",
     "react": "^18.3.1",

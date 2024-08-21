@@ -8,6 +8,7 @@ import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined
 import DashboardIcon from '@mui/icons-material/Dashboard'; // Icono para Dashboard
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import AddBoxIcon from '@mui/icons-material/AddBox'; // Importa el nuevo icono
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const navigate = useNavigate();
