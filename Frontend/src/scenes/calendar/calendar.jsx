@@ -1,3 +1,4 @@
+// File: Calendar.jsx
 import React, { useState, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import { formatDate } from "@fullcalendar/core";
@@ -51,11 +52,16 @@ const Calendar = () => {
         setCurrentEvents(response.data.map(event => ({
           ...event,
           start: event.start,
-          id: event.id || `${event.start}-${event.conductor}`,  // Asegúrate de que cada evento tenga un ID único
+          id: event.id || generateNumericId(),  // Generar un ID numérico
         })));
       })
       .catch((error) => console.error("Error al obtener los encargos:", error));
   }, []);
+
+  // Función para generar un ID numérico como string sin escape de comillas
+  const generateNumericId = () => {
+    return Math.floor(Math.random() * 10000000000000).toString(); // Genera un número grande como string
+  };
 
   const handleDateClick = (selected) => {
     setSelectedDate(selected);
@@ -110,7 +116,7 @@ const Calendar = () => {
     }
 
     const newEvent = {
-      id: `${selectedDate.dateStr}-${camionSeleccionado.matricula}-${Date.now()}`, // Genera ID único con timestamp
+      id: generateNumericId(),  // Generar un ID numérico
       title: `Encargo de ${camionSeleccionado.conductor} - ${formValues.carga} Kg`,
       start: selectedDate.startStr,
       allDay: selectedDate.allDay,

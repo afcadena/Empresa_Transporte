@@ -7,6 +7,7 @@ import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const navigate = useNavigate();
@@ -134,6 +135,13 @@ const SidebarConductor = () => {
               title="Entregas"
               to="/entregas"
               icon={<CalendarTodayOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Notificaciones"
+              to="/condunotis" // Añadir la ruta para las notificaciones
+              icon={<NotificationsActiveIcon />}
               selected={selected}
               setSelected={setSelected}
             />

@@ -1,3 +1,4 @@
+// File: SidebarComponent.jsx
 import React, { useState, useEffect } from 'react';
 import { Sidebar as ProSidebar, Menu, MenuItem } from 'react-pro-sidebar';
 import { Box, IconButton, Typography, useTheme } from '@mui/material';
@@ -8,7 +9,8 @@ import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined
 import DashboardIcon from '@mui/icons-material/Dashboard'; 
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import AddBoxIcon from '@mui/icons-material/AddBox'; 
-import ExitToAppIcon from '@mui/icons-material/ExitToApp'; 
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'; // Importa el icono de notificaciones
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const navigate = useNavigate();
@@ -40,13 +42,11 @@ const SidebarComponent = () => {
   const navigate = useNavigate(); 
 
   useEffect(() => {
-
     const loggedInUser = localStorage.getItem('userEmail') || 'Usuario';
     setUserName(loggedInUser);
   }, []);
 
   const handleLogout = () => {
-    
     localStorage.removeItem('loggedIn'); 
     localStorage.removeItem('userRole'); 
     localStorage.removeItem('userEmail'); 
@@ -156,7 +156,14 @@ const SidebarComponent = () => {
               selected={selected}
               setSelected={setSelected}
             />
-            
+            <Item
+              title="Notificaciones"  // Nuevo elemento para "Notificaciones"
+              to="/notificaciones"
+              icon={<NotificationsActiveIcon />} 
+              selected={selected}
+              setSelected={setSelected}
+            />
+
             <MenuItem
               onClick={handleLogout}
               style={{

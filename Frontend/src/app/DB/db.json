@@ -31,7 +31,7 @@
       "cargaActualKg": 0,
       "conductor": "Carlos",
       "correo": "carlos@test.com",
-      "contraseña": "123456789",
+      "contraseña": "1234567890",
       "rol": "conductor"
     },
     {
@@ -39,7 +39,7 @@
       "matricula": "ABC125",
       "capacidadCargaKg": "120",
       "consumoGasolinaGalonesPorKm": "1.5",
-      "cargaActualKg": 0,
+      "cargaActualKg": 120,
       "conductor": "Juan",
       "correo": "juan@test.com",
       "contraseña": "987654321",
@@ -50,7 +50,7 @@
       "matricula": "RBS479",
       "capacidadCargaKg": 300,
       "consumoGasolinaGalonesPorKm": 0.6,
-      "cargaActualKg": 0,
+      "cargaActualKg": 300,
       "conductor": "Luis",
       "correo": "luis@test.com",
       "contraseña": "test1",
@@ -64,20 +64,41 @@
       "conductor": "Fabio",
       "correo": "fabio@test.com",
       "contraseña": "123456789",
-      "cargaActualKg": 0,
-      "rol": "conductor"
-    },
-    {
-      "id": "1724594535668",
-      "matricula": "HDJ198",
-      "capacidadCargaKg": 800,
-      "consumoGasolinaGalonesPorKm": 1.6,
-      "conductor": "Carlos",
-      "correo": "carlos@test.com",
-      "contraseña": "123456789",
-      "cargaActualKg": 0,
+      "cargaActualKg": 500,
       "rol": "conductor"
     }
   ],
-  "encargos": []
+  "encargos": [],
+  "notificaciones": [
+    {
+      "estado": "aceptada",
+      "id": "4988465440426"
+    },
+    {
+      "id": "6ee1",
+      "conductor": "Fabio",
+      "mensaje": "Tu encargo con ID 4988465440426 ha sido aceptado y eliminado.",
+      "estado": "confirmada"
+    },
+    {
+      "estado": "aceptada",
+      "id": "8954057363886"
+    },
+    {
+      "id": "ce96",
+      "conductor": "Juan",
+      "mensaje": "Tu encargo con ID 8954057363886 ha sido aceptado y eliminado.",
+      "estado": "confirmada"
+    },
+    {
+      "estado": "aceptada",
+      "id": "9775929850141"
+    },
+    {
+      "id": "bdb4",
+      "conductor": "Luis",
+      "mensaje": "Tu encargo con ID 9775929850141 ha sido aceptado y eliminado.",
+      "estado": "confirmada"
+    }
+  ]
 }

@@ -1,89 +1,151 @@
 import React, { useState, useEffect } from "react";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import listPlugin from "@fullcalendar/list";
-import { Box, Typography, Dialog, DialogActions, DialogContent, DialogTitle, Button } from "@mui/material";
+import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import axios from "axios";
 
-const Entregas = ({ conductorId }) => {
-  const [eventos, setEventos] = useState([]);
-  const [openEventDetails, setOpenEventDetails] = useState(false);
-  const [eventDetails, setEventDetails] = useState(null);
+const EntregasPendientes = () => {
+  const [entregas, setEntregas] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [conductorNombre, setConductorNombre] = useState(null); // Almacenamos el nombre del conductor
+  const [openDialog, setOpenDialog] = useState(false); // Estado para abrir el diálogo de confirmación
+  const [selectedEntrega, setSelectedEntrega] = useState(null); // Entrega seleccionada para finalizar
 
-  // Cargar los eventos (entregas) del conductor desde la base de datos
   useEffect(() => {
-    // Asegúrate de que la URL esté configurada para filtrar por conductorId
-    axios
-      .get(`http://localhost:3001/encargos`, { params: { conductorId } }) // Usa params para pasar el query
+    const userEmail = localStorage.getItem("userEmail");
+
+    // Primero obtenemos el camión y el nombre del conductor usando el correo electrónico
+    axios.get(`http://localhost:3001/camiones?correo=${userEmail}`)
       .then((response) => {
-        setEventos(response.data);
+        const assignedCamion = response.data[0]; // Suponemos que el correo es único y devuelve un camión
+        if (assignedCamion) {
+          setConductorNombre(assignedCamion.conductor); // Guardamos el nombre del conductor
+        } else {
+          setError("No se encontró un camión asignado.");
+        }
       })
-      .catch((error) => console.error("Error al obtener los encargos:", error));
-  }, [conductorId]);
+      .catch((error) => {
+        console.error("Error al obtener el camión:", error);
+        setError("Error al cargar los datos del camión.");
+      });
+  }, []);
 
-  // Muestra los detalles del evento al hacer clic
-  const handleEventClick = (selected) => {
-    setEventDetails(selected.event.extendedProps);
-    setOpenEventDetails(true);
+  useEffect(() => {
+    // Una vez que tengamos el nombre del conductor, hacemos la llamada para obtener las entregas
+    if (conductorNombre) {
+      axios.get(`http://localhost:3001/encargos`)
+        .then((response) => {
+          const entregasTotales = response.data; // Asumimos que la API devuelve todas las entregas
+          // Filtramos por el nombre del conductor obtenido del camión
+          const entregasFiltradas = entregasTotales.filter(entrega => entrega.extendedProps.conductor === conductorNombre); 
+          if (entregasFiltradas.length > 0) {
+            setEntregas(entregasFiltradas);
+          } else {
+            setError("No se encontraron entregas pendientes para este conductor.");
+          }
+        })
+        .catch((error) => {
+          console.error("Error al obtener las entregas:", error);
+          setError("Error al cargar los datos de entregas.");
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [conductorNombre]);
+
+  const handleFinalizarClick = (entrega) => {
+    setSelectedEntrega(entrega);
+    setOpenDialog(true); // Abrir el diálogo de confirmación
   };
 
-  // Cierra la ventana de detalles del evento
-  const handleCloseEventDetails = () => {
-    setOpenEventDetails(false);
-    setEventDetails(null); // Limpiar los detalles del evento
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedEntrega(null);
   };
+
+  const handleConfirmFinalizar = () => {
+    if (!selectedEntrega) {
+      alert("No se seleccionó ninguna entrega.");
+      return;
+    }
+
+    // Enviar la notificación al administrador con el ID del encargo seleccionado
+    axios.post("http://localhost:3001/notificaciones", {
+      conductor: conductorNombre,
+      encargo: selectedEntrega.title,
+      fecha: selectedEntrega.start,
+      mensaje: "El conductor ha finalizado el encargo.",
+      id: selectedEntrega.id, // Usamos el ID del encargo como ID de la notificación
+    })
+    .then(() => {
+      alert("Se ha enviado la notificación al administrador.");
+      handleCloseDialog();
+    })
+    .catch((error) => {
+      console.error("Error al enviar la notificación:", error);
+      alert("Hubo un problema al enviar la notificación.");
+    });
+  };
+
+  if (loading) {
+    return <Typography>Cargando...</Typography>;
+  }
+
+  if (error) {
+    return <Typography color="error">{error}</Typography>;
+  }
 
   return (
     <Box m="20px">
       <Typography variant="h4" gutterBottom>
-        Calendario de Entregas
+        Entregas Pendientes
       </Typography>
 
-      <Box>
-        <FullCalendar
-          height="75vh"
-          plugins={[dayGridPlugin, timeGridPlugin, listPlugin]}
-          headerToolbar={{
-            left: "prev,next today",
-            center: "title",
-            right: "dayGridMonth,timeGridWeek,timeGridDay",
-          }}
-          initialView="dayGridMonth"
-          events={eventos.map(evento => ({
-            id: evento.id,
-            title: `Entrega de ${evento.carga} Kg`,
-            start: evento.fecha, // Usa la fecha en el formato adecuado
-            end: evento.fecha,   // Usa la fecha en el formato adecuado
-            extendedProps: {
-              carga: evento.carga,
-              destinacion: evento.destinacion,
-              fecha: evento.fecha,
-            },
-          }))}
-          eventClick={handleEventClick} // Maneja clic en evento
-          editable={false} // El conductor no puede modificar los eventos
-          selectable={false}
-        />
-      </Box>
+      <TableContainer component={Paper} sx={{ mt: 4 }}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Descripción</TableCell>
+              <TableCell>Fecha de Inicio</TableCell>
+              <TableCell>Fecha de Fin</TableCell>
+              <TableCell>Destino</TableCell>
+              <TableCell>Peso de Carga (Kg)</TableCell>
+              <TableCell>Acciones</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {entregas.map((entrega) => (
+              <TableRow key={entrega.id.toString()}> 
+                <TableCell>{`Entrega de ${entrega.extendedProps.carga} Kg`}</TableCell>
+                <TableCell>{entrega.start}</TableCell>
+                <TableCell>{entrega.end || entrega.start}</TableCell>
+                <TableCell>{entrega.extendedProps.destinacion}</TableCell>
+                <TableCell>{entrega.extendedProps.carga}</TableCell>
+                <TableCell>
+                  <Button variant="contained" color="primary" onClick={() => handleFinalizarClick(entrega)}>
+                    Finalizar
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
-      {/* DETALLES DEL EVENTO */}
-      <Dialog open={openEventDetails} onClose={handleCloseEventDetails}>
-        <DialogTitle>Detalles de la Entrega</DialogTitle>
+      {/* Diálogo de confirmación */}
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>Confirmar Finalización</DialogTitle>
         <DialogContent>
-          {eventDetails ? (
-            <>
-              <Typography variant="h6">Carga: {eventDetails.carga} Kg</Typography>
-              <Typography variant="h6">Lugar de Destinación: {eventDetails.destinacion}</Typography>
-              <Typography variant="h6">Fecha: {eventDetails.fecha}</Typography> {/* Asegúrate de que `fecha` esté en el formato correcto */}
-            </>
-          ) : (
-            <Typography variant="h6">No hay detalles disponibles.</Typography>
-          )}
+          <DialogContentText>
+            ¿Está seguro que finalizó el encargo "{selectedEntrega?.title}"?
+          </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseEventDetails} color="primary">
-            Cerrar
+          <Button onClick={handleCloseDialog} color="primary">
+            Cancelar
+          </Button>
+          <Button onClick={handleConfirmFinalizar} color="secondary">
+            Confirmar
           </Button>
         </DialogActions>
       </Dialog>
@@ -91,4 +153,4 @@ const Entregas = ({ conductorId }) => {
   );
 };
 
-export default Entregas;
+export default EntregasPendientes;

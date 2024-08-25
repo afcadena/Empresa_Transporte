@@ -12,6 +12,8 @@ import Form from "./scenes/form";
 import LoginRegister from "./app/Login_register/Login_register";
 import CargarCamion from "./scenes/cargarCamion/index";  // Importa el nuevo componente
 import MiCamion from "./scenes/faq/miCamion";  // Asegúrate de tener este componente creado para mostrar la información del camión
+import Notificaciones from "./scenes/faq/notificaciones";
+import ConductorNotifications from "./scenes/faq/condunotis"
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -51,6 +53,7 @@ function App() {
                         <Routes>
                           <Route path="/mi_camion" element={<MiCamion />} /> {/* Ruta para ver información del camión */}
                           <Route path="/entregas" element={<Entregas />} />
+                          <Route path="/condunotis" element={<ConductorNotifications />} />
 
                         </Routes>
                       </main>
@@ -64,6 +67,7 @@ function App() {
                           <Route path="/calendar" element={<Calendar />} />
                           <Route path="/form" element={<Form />} />
                           <Route path="/cargar_camion" element={<CargarCamion />} /> {/* Nueva ruta */}
+                          <Route path="/notificaciones" element={<Notificaciones />} />
                         </Routes>
                       </main>
                     </>
