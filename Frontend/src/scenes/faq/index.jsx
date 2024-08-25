@@ -24,20 +24,32 @@ const FAQ = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [camiones, setCamiones] = useState([]);
+  const [filteredCamiones, setFilteredCamiones] = useState([]);
   const [selectedCamion, setSelectedCamion] = useState(null);
   const [open, setOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [camionToDelete, setCamionToDelete] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     axios.get("http://localhost:3001/camiones")
       .then((response) => {
         setCamiones(response.data);
+        setFilteredCamiones(response.data); // Inicialmente, filtrar todos los camiones
       })
       .catch((error) => {
         console.error("Error al obtener los camiones:", error);
       });
   }, []);
+
+  useEffect(() => {
+    // Filtrar camiones según el término de búsqueda
+    setFilteredCamiones(
+      camiones.filter(camion =>
+        camion.matricula.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  }, [searchTerm, camiones]);
 
   const handleClickOpen = (camion) => {
     setSelectedCamion(camion);
@@ -115,9 +127,22 @@ const FAQ = () => {
       });
   };
 
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
   return (
     <Box m="20px">
       <Header title="Camiones" subtitle="Lista de todos los camiones registrados" />
+      
+      <TextField
+        label="Buscar por matrícula"
+        variant="outlined"
+        fullWidth
+        margin="normal"
+        value={searchTerm}
+        onChange={handleSearchChange}
+      />
 
       <TableContainer component={Paper} sx={{ mt: 4 }}>
         <Table>
@@ -133,7 +158,7 @@ const FAQ = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {camiones.map((camion) => (
+            {filteredCamiones.map((camion) => (
               <TableRow key={camion.id}>
                 <TableCell>{camion.matricula}</TableCell>
                 <TableCell>{camion.capacidadCargaKg}</TableCell>
@@ -233,27 +258,19 @@ const FAQ = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            Cancelar
-          </Button>
-          <Button onClick={handleSave} color="primary">
-            Guardar
-          </Button>
+          <Button onClick={handleClose}>Cancelar</Button>
+          <Button onClick={handleSave} color="primary">Guardar</Button>
         </DialogActions>
       </Dialog>
 
       <Dialog open={confirmOpen} onClose={handleConfirmClose}>
         <DialogTitle>Confirmar Eliminación</DialogTitle>
         <DialogContent>
-          <p>¿Estás seguro de que quieres eliminar este camión?</p>
+          <p>¿Estás seguro de que deseas eliminar este camión?</p>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleConfirmClose} color="primary">
-            Cancelar
-          </Button>
-          <Button onClick={handleDelete} color="secondary">
-            Eliminar
-          </Button>
+          <Button onClick={handleConfirmClose}>Cancelar</Button>
+          <Button onClick={handleDelete} color="primary">Eliminar</Button>
         </DialogActions>
       </Dialog>
     </Box>

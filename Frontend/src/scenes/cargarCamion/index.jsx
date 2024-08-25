@@ -5,6 +5,7 @@ import axios from "axios";
 
 const CargarCamion = () => {
   const [camiones, setCamiones] = useState([]);
+  const [filteredCamiones, setFilteredCamiones] = useState([]);
   const [selectedCamion, setSelectedCamion] = useState(null);
   const [openSelectCamion, setOpenSelectCamion] = useState(true); // Diálogo de selección de camión
   const [openSetCarga, setOpenSetCarga] = useState(false); // Diálogo de entrada de carga
@@ -12,16 +13,31 @@ const CargarCamion = () => {
   const [openSuccessDialog, setOpenSuccessDialog] = useState(false); // Diálogo de éxito
   const [carga, setCarga] = useState("");
   const [camionToReset, setCamionToReset] = useState(null); // Camión que se desea restablecer
+  const [searchTerm, setSearchTerm] = useState(""); // Estado para el término de búsqueda
 
   useEffect(() => {
     axios.get("http://localhost:3001/camiones")
       .then((response) => {
         setCamiones(response.data);
+        setFilteredCamiones(response.data); // Inicializar con todos los camiones
       })
       .catch((error) => {
         console.error("Error al obtener los camiones:", error);
       });
   }, []);
+
+  const handleSearchChange = (event) => {
+    const term = event.target.value;
+    setSearchTerm(term);
+
+    if (term) {
+      setFilteredCamiones(camiones.filter(camion =>
+        camion.matricula.toLowerCase().includes(term.toLowerCase())
+      ));
+    } else {
+      setFilteredCamiones(camiones);
+    }
+  };
 
   const handleSelectCamion = (camion) => {
     setSelectedCamion(camion);
@@ -45,6 +61,9 @@ const CargarCamion = () => {
     axios.put(`http://localhost:3001/camiones/${selectedCamion.id}`, nuevoCamion)
       .then(() => {
         setCamiones((prev) => prev.map((camion) => 
+          camion.id === selectedCamion.id ? nuevoCamion : camion
+        ));
+        setFilteredCamiones((prev) => prev.map((camion) => 
           camion.id === selectedCamion.id ? nuevoCamion : camion
         ));
         setOpenSetCarga(false);
@@ -83,6 +102,9 @@ const CargarCamion = () => {
         setCamiones((prev) => prev.map((c) =>
           c.id === camionToReset.id ? camionReset : c
         ));
+        setFilteredCamiones((prev) => prev.map((c) =>
+          c.id === camionToReset.id ? camionReset : c
+        ));
         setOpenSuccessDialog(true); // Mostrar el diálogo de éxito
         setOpenConfirmDownload(false);
         setCamionToReset(null);
@@ -110,6 +132,13 @@ const CargarCamion = () => {
       <Header title="Cargar Camión" subtitle="Seleccione un camión para realizar la carga" />
 
       <Box display="flex" justifyContent="space-between" alignItems="center" mb="20px">
+        <TextField
+          label="Buscar por Matrícula"
+          variant="outlined"
+          size="small"
+          value={searchTerm}
+          onChange={handleSearchChange}
+        />
         <Button variant="contained" color="primary" onClick={handleAddCamion}>
          Cargar camiones
         </Button>
@@ -128,7 +157,7 @@ const CargarCamion = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {camiones.map((camion) => (
+            {filteredCamiones.map((camion) => (
               <TableRow key={camion.id}>
                 <TableCell>{camion.matricula}</TableCell>
                 <TableCell>{camion.capacidadCargaKg}</TableCell>
