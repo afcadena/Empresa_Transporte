@@ -1,5 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { Box, useTheme, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
+import {
+  Box,
+  useTheme,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField
+} from "@mui/material";
 import Header from "../../components/Header";
 import { tokens } from "../../Theme";
 import axios from "axios";
@@ -73,6 +89,11 @@ const FAQ = () => {
   };
 
   const handleDelete = () => {
+    if (!camionToDelete || !camionToDelete.id) {
+      console.error("Error: El camión a eliminar no tiene un ID válido.");
+      return;
+    }
+
     axios.delete(`http://localhost:3001/camiones/${camionToDelete.id}`)
       .then(() => {
         setCamiones((prev) => prev.filter((camion) => camion.id !== camionToDelete.id));
@@ -80,6 +101,17 @@ const FAQ = () => {
       })
       .catch((error) => {
         console.error("Error al eliminar el camión:", error);
+        if (error.response) {
+          console.error("Respuesta del servidor:", error.response);
+          alert(`Error al eliminar el camión: ${error.response.statusText}`);
+          console.log("Datos completos de la respuesta:", error.response.data);
+        } else if (error.request) {
+          console.error("Sin respuesta del servidor:", error.request);
+          alert("Error: No se recibió respuesta del servidor. Verifica la conexión.");
+        } else {
+          console.error("Error durante la configuración de la solicitud:", error.message);
+          alert(`Error: ${error.message}`);
+        }
       });
   };
 
@@ -115,6 +147,7 @@ const FAQ = () => {
                     color="primary"
                     onClick={() => handleClickOpen(camion)}
                     sx={{ marginRight: "10px" }}
+                    disabled={camion.cargaActualKg > 0} // Desactivar si la carga actual es mayor a 0
                   >
                     Editar
                   </Button>
@@ -122,6 +155,7 @@ const FAQ = () => {
                     variant="contained"
                     sx={{ backgroundColor: "#E52647", color: "#fff" }}
                     onClick={() => handleDeleteConfirmation(camion)}
+                    disabled={camion.cargaActualKg > 0} // Desactivar si la carga actual es mayor a 0
                   >
                     Eliminar
                   </Button>
@@ -154,6 +188,7 @@ const FAQ = () => {
             name="capacidadCargaKg"
             value={selectedCamion?.capacidadCargaKg || ''}
             onChange={handleChange}
+            disabled={selectedCamion?.cargaActualKg > 0} // Desactivar si la carga actual es mayor a 0
           />
           <TextField
             margin="dense"
@@ -163,6 +198,7 @@ const FAQ = () => {
             name="consumoGasolinaGalonesPorKm"
             value={selectedCamion?.consumoGasolinaGalonesPorKm || ''}
             onChange={handleChange}
+            disabled={selectedCamion?.cargaActualKg > 0} // Desactivar si la carga actual es mayor a 0
           />
           <TextField
             margin="dense"
@@ -183,6 +219,7 @@ const FAQ = () => {
             name="conductor"
             value={selectedCamion?.conductor || ''}
             onChange={handleChange}
+            disabled={selectedCamion?.cargaActualKg > 0} // Desactivar si la carga actual es mayor a 0
           />
           <TextField
             margin="dense"
@@ -192,6 +229,7 @@ const FAQ = () => {
             name="correo"
             value={selectedCamion?.correo || ''}
             onChange={handleChange}
+            disabled={selectedCamion?.cargaActualKg > 0} // Desactivar si la carga actual es mayor a 0
           />
         </DialogContent>
         <DialogActions>
@@ -205,18 +243,16 @@ const FAQ = () => {
       </Dialog>
 
       <Dialog open={confirmOpen} onClose={handleConfirmClose}>
-        <DialogTitle>Confirmar eliminación</DialogTitle>
+        <DialogTitle>Confirmar Eliminación</DialogTitle>
         <DialogContent>
-          <Box>
-            ¿Estás seguro de que deseas eliminar el camión con matrícula {camionToDelete?.matricula}?
-          </Box>
+          <p>¿Estás seguro de que quieres eliminar este camión?</p>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleConfirmClose} color="primary">
-            No
+            Cancelar
           </Button>
-          <Button onClick={handleDelete} sx={{ backgroundColor: "#E52647", color: "#fff" }}>
-            Sí, eliminar
+          <Button onClick={handleDelete} color="secondary">
+            Eliminar
           </Button>
         </DialogActions>
       </Dialog>

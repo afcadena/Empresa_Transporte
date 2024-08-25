@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import { formatDate } from "@fullcalendar/core";
 import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
 import {
@@ -46,13 +45,13 @@ const Calendar = () => {
       })
       .catch((error) => console.error("Error al obtener los camiones:", error));
 
-    // Cargar los encargos existentes
     axios
       .get("http://localhost:3001/encargos")
       .then((response) => {
         setCurrentEvents(response.data.map(event => ({
           ...event,
           start: event.start,
+          id: event.id || `${event.start}-${event.conductor}`,  // Asegúrate de que cada evento tenga un ID único
         })));
       })
       .catch((error) => console.error("Error al obtener los encargos:", error));
@@ -60,6 +59,7 @@ const Calendar = () => {
 
   const handleDateClick = (selected) => {
     setSelectedDate(selected);
+    setMejorCamion(getBestCamion()); // Actualiza mejorCamion al seleccionar la fecha
     setOpenForm(true);
   };
 
@@ -110,7 +110,7 @@ const Calendar = () => {
     }
 
     const newEvent = {
-      id: `${selectedDate.dateStr}-${camionSeleccionado.matricula}`,
+      id: `${selectedDate.dateStr}-${camionSeleccionado.matricula}-${Date.now()}`, // Genera ID único con timestamp
       title: `Encargo de ${camionSeleccionado.conductor} - ${formValues.carga} Kg`,
       start: selectedDate.startStr,
       allDay: selectedDate.allDay,
@@ -126,31 +126,56 @@ const Calendar = () => {
     axios
       .post("http://localhost:3001/encargos", newEvent)
       .then((response) => {
-        // Actualiza la lista de eventos después de guardar
         setCurrentEvents([...currentEvents, response.data]);
+
+        const nuevaCarga = parseFloat(camionSeleccionado.cargaActualKg) + parseFloat(formValues.carga);
+        const camionActualizado = {
+          ...camionSeleccionado,
+          cargaActualKg: nuevaCarga,
+        };
+
+        return axios.put(`http://localhost:3001/camiones/${camionSeleccionado.id}`, camionActualizado);
+      })
+      .then(() => {
+        alert(`El camión ${camionSeleccionado.matricula} ha sido cargado con ${formValues.carga} Kg.`);
         handleCloseForm();
       })
-      .catch((error) => console.error("Error al guardar el encargo:", error));
+      .catch((error) => {
+        console.error("Error al guardar el encargo o actualizar la carga:", error);
+      });
   };
 
   const handleEventClick = (selected) => {
-    setEventDetails(selected.event.extendedProps);
+    setEventDetails({
+      id: selected.event.id,
+      ...selected.event.extendedProps,
+    });
     setOpenEventDetails(true);
   };
 
   const handleDeleteEvent = () => {
+    if (!eventDetails?.id) {
+      alert("No se pudo obtener el ID del encargo.");
+      return;
+    }
+
     axios
       .delete(`http://localhost:3001/encargos/${eventDetails.id}`)
       .then(() => {
-        // Actualiza la lista de eventos después de eliminar
         const updatedEvents = currentEvents.filter(event => event.id !== eventDetails.id);
         setCurrentEvents(updatedEvents);
+        removeEventFromCalendar(eventDetails.camion); // Llamada para eliminar el evento del calendario
         handleCloseEventDetails();
       })
       .catch((error) => console.error("Error al eliminar el encargo:", error));
   };
 
   const handleEditEvent = () => {
+    if (!eventDetails?.id) {
+      alert("No se pudo obtener el ID del encargo.");
+      return;
+    }
+
     axios
       .put(`http://localhost:3001/encargos/${eventDetails.id}`, {
         ...eventDetails,
@@ -158,7 +183,6 @@ const Calendar = () => {
         destinacion: formValues.destinacion,
       })
       .then(() => {
-        // Actualiza la lista de eventos después de editar
         const updatedEvents = currentEvents.map(event =>
           event.id === eventDetails.id
             ? { ...event, extendedProps: { ...event.extendedProps, carga: formValues.carga, destinacion: formValues.destinacion } }
@@ -172,6 +196,23 @@ const Calendar = () => {
 
   const handleCloseEventDetails = () => {
     setOpenEventDetails(false);
+  };
+
+  const removeEventFromCalendar = (matricula) => {
+    axios.get("http://localhost:3001/encargos")
+      .then((response) => {
+        const eventToRemove = response.data.find(event => event.extendedProps.camion === matricula);
+        if (eventToRemove) {
+          return axios.delete(`http://localhost:3001/encargos/${eventToRemove.id}`);
+        }
+      })
+      .then(() => {
+        setCurrentEvents(prevEvents => prevEvents.filter(event => event.extendedProps.camion !== matricula));
+        alert(`Evento relacionado con el camión ${matricula} ha sido eliminado del calendario.`);
+      })
+      .catch((error) => {
+        console.error("Error al eliminar el evento del calendario:", error);
+      });
   };
 
   return (
@@ -203,7 +244,7 @@ const Calendar = () => {
         <Box flex="1 1 100%" ml="15px">
           <FullCalendar
             height="75vh"
-            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
+            plugins={[dayGridPlugin, interactionPlugin, listPlugin]}
             headerToolbar={{
               left: "prev,next today",
               center: "title",
@@ -221,6 +262,7 @@ const Calendar = () => {
         </Box>
       </Box>
 
+      {/* Formulario para registrar encargo */}
       <Dialog open={openForm} onClose={handleCloseForm}>
         <DialogTitle>Registrar Encargo</DialogTitle>
         <DialogContent>
@@ -244,52 +286,35 @@ const Calendar = () => {
           />
 
           {mejorCamion && (
-            <Typography variant="h6" sx={{ marginTop: 2 }}>
-              Mejor Camión Seleccionado: {mejorCamion.matricula} (Conductor: {mejorCamion.conductor})
+            <Typography variant="h6" mt="15px">
+              Mejor Camión: {mejorCamion.matricula} (Conductor: {mejorCamion.conductor})
             </Typography>
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseForm} color="primary">Cancelar</Button>
-          <Button onClick={handleSaveEncargo} color="primary">Guardar</Button>
+          <Button onClick={handleCloseForm}>Cancelar</Button>
+          <Button onClick={handleSaveEncargo}>Guardar</Button>
         </DialogActions>
       </Dialog>
 
+      {/* Detalles del evento */}
       <Dialog open={openEventDetails} onClose={handleCloseEventDetails}>
-        <DialogTitle>Detalles del Evento</DialogTitle>
+        <DialogTitle>Detalles del Encargo</DialogTitle>
         <DialogContent>
-          <Typography variant="h6">Camión: {eventDetails?.camion}</Typography>
-          <Typography variant="h6">Conductor: {eventDetails?.conductor}</Typography>
-          <Typography variant="h6">Carga: {eventDetails?.carga} Kg</Typography>
-          <Typography variant="h6">Lugar de Destinación: {eventDetails?.destinacion}</Typography>
-          <Typography variant="h6">Fecha: {formatDate(eventDetails?.start, {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          })}</Typography>
-          <TextField
-            fullWidth
-            variant="filled"
-            label="Carga (Kg)"
-            name="carga"
-            value={formValues.carga}
-            onChange={handleFormChange}
-            margin="dense"
-          />
-          <TextField
-            fullWidth
-            variant="filled"
-            label="Lugar de Destinación"
-            name="destinacion"
-            value={formValues.destinacion}
-            onChange={handleFormChange}
-            margin="dense"
-          />
+          {eventDetails && (
+            <Box>
+              <Typography variant="h6">Título: {eventDetails.title}</Typography>
+              <Typography>Conductor: {eventDetails.conductor}</Typography>
+              <Typography>Camión: {eventDetails.camion}</Typography>
+              <Typography>Carga: {eventDetails.carga} Kg</Typography>
+              <Typography>Destinación: {eventDetails.destinacion}</Typography>
+            </Box>
+          )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseEventDetails} color="primary">Cerrar</Button>
-          <Button onClick={handleEditEvent} color="primary">Editar</Button>
           <Button onClick={handleDeleteEvent} color="error">Eliminar</Button>
+          <Button onClick={handleEditEvent} color="primary">Editar</Button>
+          <Button onClick={handleCloseEventDetails}>Cerrar</Button>
         </DialogActions>
       </Dialog>
     </Box>

@@ -9,6 +9,7 @@ const CargarCamion = () => {
   const [openSelectCamion, setOpenSelectCamion] = useState(true); // Diálogo de selección de camión
   const [openSetCarga, setOpenSetCarga] = useState(false); // Diálogo de entrada de carga
   const [openConfirmDownload, setOpenConfirmDownload] = useState(false); // Diálogo de confirmación de descarga
+  const [openSuccessDialog, setOpenSuccessDialog] = useState(false); // Diálogo de éxito
   const [carga, setCarga] = useState("");
   const [camionToReset, setCamionToReset] = useState(null); // Camión que se desea restablecer
 
@@ -65,22 +66,39 @@ const CargarCamion = () => {
       cargaActualKg: 0, // Restablecer la carga a cero
     };
 
+    // Primero actualiza el camión
     axios.put(`http://localhost:3001/camiones/${camionToReset.id}`, camionReset)
+      .then(() => {
+        // Luego elimina los eventos asociados
+        return axios.get("http://localhost:3001/encargos");
+      })
+      .then((response) => {
+        const eventosAEliminar = response.data.filter(evento => evento.extendedProps.camion === camionToReset.matricula);
+        const deleteRequests = eventosAEliminar.map(evento => 
+          axios.delete(`http://localhost:3001/encargos/${evento.id}`)
+        );
+        return Promise.all(deleteRequests);
+      })
       .then(() => {
         setCamiones((prev) => prev.map((c) =>
           c.id === camionToReset.id ? camionReset : c
         ));
+        setOpenSuccessDialog(true); // Mostrar el diálogo de éxito
         setOpenConfirmDownload(false);
         setCamionToReset(null);
       })
       .catch((error) => {
-        console.error("Error al restablecer la carga:", error);
+        console.error("Error al restablecer la carga o eliminar eventos:", error);
       });
   };
 
   const cancelResetCarga = () => {
     setOpenConfirmDownload(false);
     setCamionToReset(null);
+  };
+
+  const handleCloseSuccessDialog = () => {
+    setOpenSuccessDialog(false);
   };
 
   const handleAddCamion = () => {
@@ -205,6 +223,19 @@ const CargarCamion = () => {
           </Button>
           <Button onClick={confirmResetCarga} color="primary">
             Sí
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Diálogo de éxito */}
+      <Dialog open={openSuccessDialog} onClose={handleCloseSuccessDialog}>
+        <DialogTitle>Éxito</DialogTitle>
+        <DialogContent>
+          La entrega se ha completado con éxito.
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseSuccessDialog} color="primary">
+            Aceptar
           </Button>
         </DialogActions>
       </Dialog>

@@ -9,18 +9,26 @@ import axios from "axios";
 const Form = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
 
+  // Genera un ID único y lo convierte en una cadena con comillas
+  const generateUniqueId = () => {
+    return Date.now().toString(); // Esto asegura que el ID se maneje como una cadena
+  };
+
   const handleFormSubmit = (values, { resetForm }) => {
     axios.post("http://localhost:3001/camiones", {
       ...values,
-      id: Date.now(), // Agrega un ID único basado en la fecha actual
+      cargaActualKg: 0, // Se asigna el valor cero a la carga actual
+      id: generateUniqueId(), // Genera un ID único y lo asigna como cadena al camión
+      rol: "conductor", // Asigna el rol directamente aquí
     })
     .then((response) => {
-      console.log("Camión registrado:", response.data);
-      alert('Camión registrado con éxito');
+      console.log("Camión registrado con el rol de conductor:", response.data);
+      alert('Camión y conductor registrados con éxito');
       resetForm(); // Reinicia el formulario después de un registro exitoso
     })
     .catch((error) => {
-      console.error("Error al registrar el camión:", error);
+      console.error("Error al registrar el camión y conductor:", error);
+      alert('Error al registrar el camión y conductor');
     });
   };
 
@@ -92,19 +100,6 @@ const Form = () => {
               <TextField
                 fullWidth
                 variant="filled"
-                type="number"
-                label="Carga Actual (Kg)"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.cargaActualKg}
-                name="cargaActualKg"
-                error={!!touched.cargaActualKg && !!errors.cargaActualKg}
-                helperText={touched.cargaActualKg && errors.cargaActualKg}
-                sx={{ gridColumn: "span 4" }}
-              />
-              <TextField
-                fullWidth
-                variant="filled"
                 type="text"
                 label="Nombre del Conductor"
                 onBlur={handleBlur}
@@ -165,11 +160,6 @@ const checkoutSchema = yup.object().shape({
     .number()
     .required("El consumo de gasolina es obligatorio")
     .min(0, "El consumo no puede ser negativo"),
-  cargaActualKg: yup
-    .number()
-    .required("La carga actual es obligatoria")
-    .min(0, "La carga actual no puede ser negativa")
-    .max(yup.ref('capacidadCargaKg'), "La carga actual no puede exceder la capacidad máxima"),
   conductor: yup.string().required("El nombre del conductor es obligatorio"),
   correo: yup.string().email("El correo es inválido").required("El correo es obligatorio"),
   contraseña: yup.string().required("La contraseña es obligatoria").min(6, "La contraseña debe tener al menos 6 caracteres"),
@@ -180,7 +170,6 @@ const initialValues = {
   matricula: "",
   capacidadCargaKg: "",
   consumoGasolinaGalonesPorKm: "",
-  cargaActualKg: "",
   conductor: "",
   correo: "",
   contraseña: "",

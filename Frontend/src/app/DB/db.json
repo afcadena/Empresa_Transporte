@@ -46,17 +46,6 @@
       "rol": "conductor"
     },
     {
-      "id": "1723637794063",
-      "matricula": "DFE265",
-      "capacidadCargaKg": 50,
-      "consumoGasolinaGalonesPorKm": 0.9,
-      "cargaActualKg": 0,
-      "conductor": "Pedro",
-      "correo": "pedro@test.com",
-      "contraseña": "abcdefg",
-      "rol": "conductor"
-    },
-    {
       "id": "1723637818592",
       "matricula": "RBS479",
       "capacidadCargaKg": 300,
@@ -66,58 +55,29 @@
       "correo": "luis@test.com",
       "contraseña": "test1",
       "rol": "conductor"
+    },
+    {
+      "id": "1724548719811",
+      "matricula": "HGF678",
+      "capacidadCargaKg": 1200,
+      "consumoGasolinaGalonesPorKm": 1.4,
+      "conductor": "Fabio",
+      "correo": "fabio@test.com",
+      "contraseña": "123456789",
+      "cargaActualKg": 0,
+      "rol": "conductor"
+    },
+    {
+      "id": "1724594535668",
+      "matricula": "HDJ198",
+      "capacidadCargaKg": 800,
+      "consumoGasolinaGalonesPorKm": 1.6,
+      "conductor": "Carlos",
+      "correo": "carlos@test.com",
+      "contraseña": "123456789",
+      "cargaActualKg": 0,
+      "rol": "conductor"
     }
   ],
-  "encargos": [
-    {
-      "id": "1",
-      "carga": 50,
-      "destinacion": "Centro de Distribución A",
-      "camionId": "1723584669165",
-      "conductor": "Carlos",
-      "fecha": "2024-08-21"
-    },
-    {
-      "id": "2",
-      "carga": 90,
-      "destinacion": "Almacén B",
-      "camionId": "1723637818592",
-      "conductor": "Luis",
-      "fecha": "2024-08-22"
-    },
-    {
-      "id": "undefined-FGR456",
-      "carga": "100",
-      "destinacion": "Cauca",
-      "camionId": "1723584669165",
-      "conductor": "Carlos",
-      "start": "2024-08-14"
-    },
-    {
-      "id": "undefined-FGR456",
-      "title": "Encargo de Carlos - 90 Kg",
-      "start": "2024-08-15",
-      "allDay": true,
-      "extendedProps": {
-        "conductor": "Carlos",
-        "camion": "FGR456",
-        "carga": "90",
-        "destinacion": "Cauca",
-        "start": "2024-08-15"
-      }
-    },
-    {
-      "id": "undefined-ABC125",
-      "title": "Encargo de Juan - 115 Kg",
-      "start": "2024-08-16",
-      "allDay": true,
-      "extendedProps": {
-        "conductor": "Juan",
-        "camion": "ABC125",
-        "carga": "115",
-        "destinacion": "Cundai",
-        "start": "2024-08-16"
-      }
-    }
-  ]
+  "encargos": []
 }
