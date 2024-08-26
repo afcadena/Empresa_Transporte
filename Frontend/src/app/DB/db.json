@@ -68,7 +68,62 @@
       "rol": "conductor"
     }
   ],
-  "encargos": [],
+  "clientes": [
+    {
+      "id": "1724548719812",
+      "nombre": "Cliente1",
+      "correo": "cliente1@example.com",
+      "contraseña": "cliente123",
+      "rol": "cliente"
+    },
+    {
+      "id": "1724548719813",
+      "nombre": "Cliente2",
+      "correo": "cliente2@example.com",
+      "contraseña": "cliente456",
+      "rol": "cliente"
+    }
+  ],
+  "pedidos": [
+    {
+      "id": "1",
+      "clienteId": "1724548719812",
+      "producto": "Producto A",
+      "cantidad": 2,
+      "estado": "Enviado",
+      "fecha": "2024-08-24T12:00:00Z",
+      "carga": 0
+    },
+    {
+      "id": "2",
+      "clienteId": "1724548719813",
+      "producto": "Producto B",
+      "cantidad": 1,
+      "estado": "Pendiente",
+      "fecha": "2024-08-25T08:30:00Z",
+      "carga": 0
+    },
+    {
+      "id": "1724639534926",
+      "producto": "Arroz",
+      "cantidad": "10",
+      "estado": "Pendiente",
+      "carga": "100",
+      "clienteId": "1724548719813",
+      "fecha": "2024-08-26T02:32:14.926Z"
+    }
+  ],
+  "encargos": [
+    {
+      "id": "1724639534926",
+      "producto": "Arroz",
+      "cantidad": "10",
+      "estado": "Pendiente",
+      "carga": "100",
+      "clienteId": "1724548719813",
+      "fecha": "2024-08-26T02:32:14.926Z"
+    }
+  ],
   "notificaciones": [
     {
       "estado": "aceptada",
@@ -99,6 +154,11 @@
       "conductor": "Luis",
       "mensaje": "Tu encargo con ID 9775929850141 ha sido aceptado y eliminado.",
       "estado": "confirmada"
+    },
+    {
+      "id": "1724639534926",
+      "mensaje": "Nuevo pedido con ID 1724639534926 realizado por el cliente 1724548719813.",
+      "estado": "pendiente"
     }
   ]
 }

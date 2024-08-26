@@ -22,10 +22,10 @@ function Login_register() {
 
   const registerUser = async () => {
     try {
-      const endpoint = formData.rol === 'conductor' ? 'camiones' : 'administrador';
+      const endpoint = formData.rol === 'conductor' ? 'camiones' : formData.rol === 'cliente' ? 'clientes' : 'administrador';
       await axios.post(`http://localhost:3001/${endpoint}`, {
         ...formData,
-        id: Date.now(),
+        id: Date.now(), // Genera un ID único basado en la marca de tiempo actual
       });
       alert('Usuario registrado con éxito');
       toggle(true);
@@ -51,18 +51,33 @@ function Login_register() {
       const conductorRes = await axios.get(`http://localhost:3001/camiones?correo=${correo}`);
       const conductor = conductorRes.data.find((u) => u.correo === correo && u.contraseña === contraseña);
 
-      // Validar si el usuario es un administrador o conductor
-      const user = admin || conductor;
+      // Buscar en la tabla de clientes
+      const clienteRes = await axios.get(`http://localhost:3001/clientes?correo=${correo}`);
+      const cliente = clienteRes.data.find((u) => u.correo === correo && u.contraseña === contraseña);
+
+      // Validar si el usuario es un administrador, conductor o cliente
+      const user = admin || conductor || cliente;
 
       if (user) {
         alert(`Inicio de sesión exitoso como ${user.rol}`);
         localStorage.setItem('loggedIn', 'true');
         localStorage.setItem('userRole', user.rol);
         localStorage.setItem('userEmail', user.correo);
+
+        // Guardar el ID del usuario si es un cliente
+        if (user.rol === 'cliente') {
+          localStorage.setItem('userId', cliente.id); // Guardar el ID del cliente en localStorage
+        } else {
+          localStorage.setItem('userId', user.id); // Guardar el ID del usuario en localStorage
+        }
+
+        // Redirigir al usuario según su rol
         if (user.rol === 'admin' || user.rol === 'superadmin') {
           window.location.href = '/form';
         } else if (user.rol === 'conductor') {
           window.location.href = '/mi_camion'; // Cambiar a la ruta principal para conductores
+        } else if (user.rol === 'cliente') {
+          window.location.href = '/mis_pedidos'; // Cambiar a la ruta principal para clientes
         }
       } else {
         setLoginError('Correo o contraseña incorrectos.');
@@ -116,6 +131,7 @@ function Login_register() {
           >
             <option value='admin'>Administrador</option>
             <option value='conductor'>Conductor</option>
+            <option value='cliente'>Cliente</option>
           </select>
           <Components.Button type='submit'>Crear cuenta</Components.Button>
         </Components.Form>

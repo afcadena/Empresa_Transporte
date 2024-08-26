@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton, Paper } from "@mui/material";
+import { Box, Typography, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton, Paper, Dialog, DialogActions, DialogContent, DialogTitle, Button } from "@mui/material";
 import axios from "axios";
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
@@ -8,6 +8,8 @@ const Notificaciones = () => {
   const [notificaciones, setNotificaciones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedNotificacion, setSelectedNotificacion] = useState(null); // Notificación seleccionada para ver detalles
+  const [openDetailsDialog, setOpenDetailsDialog] = useState(false); // Estado para abrir el diálogo de detalles
 
   useEffect(() => {
     // Obtener las notificaciones desde el servidor
@@ -74,6 +76,24 @@ const Notificaciones = () => {
       });
   };
 
+  const handleViewDetails = (notificacion) => {
+    // Obtener detalles del encargo usando el ID de la notificación
+    axios.get(`http://localhost:3001/encargos/${notificacion.id}`)
+      .then((response) => {
+        setSelectedNotificacion({ ...notificacion, encargoDetails: response.data });
+        setOpenDetailsDialog(true);
+      })
+      .catch((error) => {
+        console.error("Error al obtener los detalles del encargo:", error.response ? error.response.data : error.message);
+        alert("Error al cargar los detalles del encargo.");
+      });
+  };
+
+  const handleCloseDetailsDialog = () => {
+    setOpenDetailsDialog(false);
+    setSelectedNotificacion(null);
+  };
+
   if (loading) {
     return <Typography>Cargando notificaciones...</Typography>;
   }
@@ -100,6 +120,9 @@ const Notificaciones = () => {
                   secondary={`Encargo: ${notificacion.encargo || 'Desconocido'} - ${notificacion.fecha || 'Fecha no disponible'}`}
                 />
                 <ListItemSecondaryAction>
+                  <IconButton edge="end" aria-label="detalles" onClick={() => handleViewDetails(notificacion)}>
+                    <Typography variant="body2">Detalles</Typography>
+                  </IconButton>
                   <IconButton edge="end" aria-label="aceptar" onClick={() => handleAceptar(notificacion)}>
                     <CheckIcon color="primary" />
                   </IconButton>
@@ -112,6 +135,30 @@ const Notificaciones = () => {
           )}
         </List>
       </Paper>
+
+      {/* Diálogo para mostrar detalles del pedido */}
+      <Dialog open={openDetailsDialog} onClose={handleCloseDetailsDialog}>
+        <DialogTitle>Detalles del Encargo</DialogTitle>
+        <DialogContent>
+          {selectedNotificacion ? (
+            <Box>
+              <Typography variant="h6">Detalles del Pedido:</Typography>
+              <Typography>Producto: {selectedNotificacion.encargoDetails?.producto || 'Desconocido'}</Typography>
+              <Typography>Cantidad: {selectedNotificacion.encargoDetails?.cantidad || 'Desconocido'}</Typography>
+              <Typography>Estado: {selectedNotificacion.encargoDetails?.estado || 'Desconocido'}</Typography>
+              <Typography>Fecha: {new Date(selectedNotificacion.encargoDetails?.fecha).toLocaleDateString() || 'Desconocido'}</Typography>
+              <Typography>Carga: {selectedNotificacion.encargoDetails?.carga || 'Desconocido'}</Typography>
+            </Box>
+          ) : (
+            <Typography>No hay detalles disponibles.</Typography>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDetailsDialog} color="primary">
+            Cerrar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
