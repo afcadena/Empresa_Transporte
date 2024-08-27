@@ -8,42 +8,37 @@ const ClienteNotifications = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Obtener el correo electrónico del usuario desde el almacenamiento local
     const userEmail = localStorage.getItem("userEmail");
 
-    // Asegúrate de que el correo electrónico esté disponible
-    if (userEmail) {
-      // Obtener el cliente usando el correo electrónico
-      axios.get(`http://localhost:3001/clientes?correo=${userEmail}`)
-        .then((response) => {
-          const cliente = response.data[0];
-          if (cliente) {
-            // Obtener las notificaciones relacionadas con el cliente
-            axios.get(`http://localhost:3001/notificaciones?clienteId=${cliente.id}`)
-              .then((response) => {
-                setNotificaciones(response.data);
-              })
-              .catch((error) => {
-                console.error("Error al obtener las notificaciones:", error);
-                setError("Error al cargar las notificaciones.");
-              })
-              .finally(() => {
-                setLoading(false);
-              });
-          } else {
-            setError("No se encontró un cliente con ese correo.");
-            setLoading(false); // Termina el loading si no hay cliente
-          }
-        })
-        .catch((error) => {
-          console.error("Error al obtener los datos del cliente:", error);
-          setError("Error al cargar los datos del cliente.");
-          setLoading(false); // Termina el loading en caso de error
-        });
-    } else {
-      setError("No se encontró un correo electrónico del usuario.");
-      setLoading(false); // Termina el loading si no hay correo electrónico
-    }
+    // Obtener el cliente usando el correo electrónico
+    axios.get(`http://localhost:3001/clientes?correo=${userEmail}`)
+      .then((response) => {
+        const cliente = response.data[0];
+        if (cliente) {
+          // Obtener las notificaciones relacionadas con el cliente
+          axios.get(`http://localhost:3001/notificaciones_cliente?clienteId=${cliente.id}`)
+            .then((response) => {
+              // Filtrar notificaciones para mostrar solo las que tienen estado "confirmada"
+              const notificacionesFiltradas = response.data.filter(noti => noti.estado === 'confirmada');
+              setNotificaciones(notificacionesFiltradas);
+            })
+            .catch((error) => {
+              console.error("Error al obtener las notificaciones:", error);
+              setError("Error al cargar las notificaciones.");
+            })
+            .finally(() => {
+              setLoading(false);
+            });
+        } else {
+          setError("No se encontró un cliente con ese correo.");
+          setLoading(false); // Termina el loading si no hay cliente
+        }
+      })
+      .catch((error) => {
+        console.error("Error al obtener los datos del cliente:", error);
+        setError("Error al cargar los datos del cliente.");
+        setLoading(false); // Termina el loading en caso de error
+      });
   }, []);
 
   if (loading) {
@@ -57,14 +52,14 @@ const ClienteNotifications = () => {
   return (
     <Box m="20px">
       <Typography variant="h4" gutterBottom>
-        Notificaciones del Cliente
+        Notificaciones Confirmadas
       </Typography>
 
       <TableContainer component={Paper} sx={{ mt: 4 }}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>ID del Pedido</TableCell>
+              <TableCell>ID del Encargo</TableCell>
               <TableCell>Mensaje</TableCell>
               <TableCell>Estado</TableCell>
               <TableCell>Fecha</TableCell>
@@ -74,15 +69,15 @@ const ClienteNotifications = () => {
             {notificaciones.length > 0 ? (
               notificaciones.map((notificacion) => (
                 <TableRow key={notificacion.id}>
-                  <TableCell>{notificacion.id}</TableCell>
-                  <TableCell>{notificacion.mensaje}</TableCell>
-                  <TableCell>{notificacion.estado}</TableCell>
-                  <TableCell>{new Date(notificacion.fecha).toLocaleString()}</TableCell>
+                  <TableCell>{notificacion.encargoId || 'Desconocido'}</TableCell>
+                  <TableCell>{notificacion.mensaje || 'Desconocido'}</TableCell>
+                  <TableCell>{notificacion.estado || 'Desconocido'}</TableCell>
+                  <TableCell>{new Date(notificacion.fecha).toLocaleString() || 'Desconocido'}</TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={4}>No hay notificaciones.</TableCell>
+                <TableCell colSpan={4}>No hay notificaciones confirmadas.</TableCell>
               </TableRow>
             )}
           </TableBody>

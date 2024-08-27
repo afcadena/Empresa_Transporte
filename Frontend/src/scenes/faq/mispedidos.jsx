@@ -28,12 +28,12 @@ const MisPedidos = () => {
     cantidad: 0,
     estado: 'Pendiente',
     carga: 0,
-    lugar: '',  // Nuevo campo para el lugar
+    lugar: '',
   });
   const [mensajeError, setMensajeError] = useState('');
   const [showNotificationDialog, setShowNotificationDialog] = useState(false);
-  const [clienteNombre, setClienteNombre] = useState(''); // Para almacenar el nombre del cliente
-  const clienteId = localStorage.getItem('userId'); // Recupera el ID del cliente desde el localStorage
+  const [clienteNombre, setClienteNombre] = useState('');
+  const clienteId = localStorage.getItem('userId');
 
   useEffect(() => {
     if (!clienteId) {
@@ -43,24 +43,31 @@ const MisPedidos = () => {
 
     const fetchPedidos = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/pedidosCliente?clienteId=${clienteId}`);
-        setPedidos(response.data);
+        // Obtener pedidos del cliente
+        const pedidosResponse = await axios.get(`http://localhost:3001/pedidosCliente?clienteId=${clienteId}`);
+        const pedidosData = pedidosResponse.data;
+
+        // Obtener encargos del cliente
+        const encargosResponse = await axios.get(`http://localhost:3001/encargosCliente?clienteId=${clienteId}`);
+        const encargosData = encargosResponse.data;
+
+        // Combinar datos de pedidos y encargos
+        const encargosConEstado = encargosData.map(encargo => {
+          const pedido = pedidosData.find(p => p.id === encargo.id);
+          return {
+            ...encargo,
+            estado: pedido ? pedido.estado : encargo.estado || 'Desconocido'
+          };
+        });
+
+        setPedidos(encargosConEstado);
+        setClienteNombre(''); // Asigna aquí el nombre del cliente si es necesario
       } catch (error) {
         setError('Error al cargar los pedidos.');
       }
     };
 
-    const fetchCliente = async () => {
-      try {
-        const response = await axios.get(`http://localhost:3001/clientes/${clienteId}`);
-        setClienteNombre(response.data.nombre); // Almacenar el nombre del cliente
-      } catch (error) {
-        setError('Error al cargar los detalles del cliente.');
-      }
-    };
-
     fetchPedidos();
-    fetchCliente(); // Obtener el nombre del cliente
   }, [clienteId]);
 
   const handleOpenDialog = () => {
@@ -86,18 +93,12 @@ const MisPedidos = () => {
     }
 
     try {
-      // Generar un ID único para el pedido (puedes ajustar el método según tus necesidades)
       const newId = Date.now().toString();
-
       const newPedido = { ...nuevoPedido, clienteId, id: newId, fecha: new Date().toISOString() };
 
-      // Enviar el pedido a la tabla de pedidosCliente
       await axios.post('http://localhost:3001/pedidosCliente', newPedido);
-
-      // Agregar el pedido a la tabla de encargosCliente
       await axios.post('http://localhost:3001/encargosCliente', newPedido);
 
-      // Enviar notificación al cliente
       await axios.post('http://localhost:3001/notificaciones_cliente', {
         id: newId,
         clienteId,
@@ -106,20 +107,17 @@ const MisPedidos = () => {
         fecha: new Date().toISOString(),
       });
 
-      // Mostrar ventana emergente de confirmación
       setShowNotificationDialog(true);
 
-      // Actualizar la lista de pedidos
       setPedidos((prevPedidos) => [...prevPedidos, newPedido]);
 
-      // Cerrar el diálogo de nuevo pedido
       handleCloseDialog();
       setNuevoPedido({
         producto: '',
         cantidad: 0,
         estado: 'Pendiente',
         carga: 0,
-        lugar: '',  // Limpiar el campo lugar
+        lugar: '',
       });
       setMensajeError('');
     } catch (error) {
@@ -151,19 +149,19 @@ const MisPedidos = () => {
               <TableCell>Estado</TableCell>
               <TableCell>Fecha</TableCell>
               <TableCell>Carga</TableCell>
-              <TableCell>Lugar</TableCell>  {/* Nueva columna para Lugar */}
+              <TableCell>Lugar</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {pedidos.map((pedido) => (
               <TableRow key={pedido.id}>
                 <TableCell>{pedido.id}</TableCell>
-                <TableCell>{pedido.producto}</TableCell>
-                <TableCell>{pedido.cantidad}</TableCell>
+                <TableCell>{pedido.producto || 'No disponible'}</TableCell>
+                <TableCell>{pedido.cantidad || 'No disponible'}</TableCell>
                 <TableCell>{pedido.estado}</TableCell>
                 <TableCell>{new Date(pedido.fecha).toLocaleDateString()}</TableCell>
-                <TableCell>{pedido.carga}</TableCell>
-                <TableCell>{pedido.lugar}</TableCell> {/* Mostrar el lugar */}
+                <TableCell>{pedido.carga || 'No disponible'}</TableCell>
+                <TableCell>{pedido.lugar || 'No disponible'}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -205,7 +203,7 @@ const MisPedidos = () => {
             onChange={handleInputChange}
             fullWidth
             margin="normal"
-          /> {/* Campo añadido para el lugar */}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog} color="primary">
@@ -223,7 +221,7 @@ const MisPedidos = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseNotificationDialog} color="primary">
-            Aceptar
+            Cerrar
           </Button>
         </DialogActions>
       </Dialog>

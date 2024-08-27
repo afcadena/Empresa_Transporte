@@ -64,7 +64,7 @@
       "conductor": "Fabio",
       "correo": "fabio@test.com",
       "contraseña": "123456789",
-      "cargaActualKg": 0,
+      "cargaActualKg": 350,
       "rol": "conductor"
     }
   ],
@@ -86,45 +86,84 @@
   ],
   "pedidos": [],
   "encargos": [],
-  "notificaciones": [],
+  "notificaciones": [
+    {
+      "estado": "aceptada",
+      "id": "2176121344842"
+    },
+    {
+      "id": "51ad",
+      "conductor": "Fabio",
+      "mensaje": "Tu encargo con ID 2176121344842 ha sido aceptado y eliminado.",
+      "estado": "confirmada"
+    }
+  ],
   "notificaciones_cliente": [
     {
-      "id": "3",
+      "estado": "aceptada",
+      "id": "1724767087359"
+    },
+    {
+      "id": "31f2",
       "clienteId": "1724548719812",
-      "mensaje": "Tu encargo con ID 1724716712463 ha sido confirmado.",
-      "estado": "confirmado",
-      "fecha": "2024-08-26T23:58:32.463Z"
+      "mensaje": "Tu encargo con ID 1724767087359 ha sido aceptado.",
+      "estado": "confirmada"
+    },
+    {
+      "estado": "aceptada",
+      "id": "1724767554456"
+    },
+    {
+      "estado": "aceptada",
+      "id": "1724770558130"
+    },
+    {
+      "id": "98af",
+      "clienteId": "1724548719812",
+      "mensaje": "Tu encargo con ID 1724770558130 ha sido aceptado.",
+      "estado": "confirmada"
+    },
+    {
+      "estado": "aceptada",
+      "id": "1724770972742"
+    },
+    {
+      "id": "4572",
+      "clienteId": "1724548719812",
+      "mensaje": "Tu encargo con ID 1724770972742 ha sido aceptado.",
+      "estado": "confirmada"
     }
   ],
   "encargosCliente": [
     {
-      "id": "1724716712463",
-      "clienteId": "1724548719812",
-      "producto": "Papel",
-      "cantidad": "20",
+      "id": "1724770558130",
+      "producto": "Arroz",
+      "cantidad": "30",
       "estado": "Pendiente",
       "carga": "200",
-      "fecha": "2024-08-26T23:58:32.463Z"
+      "lugar": "Supermecado La Doña",
+      "clienteId": "1724548719812",
+      "fecha": "2024-08-27T14:55:58.130Z"
+    },
+    {
+      "id": "1724770972742",
+      "producto": "Libros",
+      "cantidad": "40",
+      "estado": "Pendiente",
+      "carga": "350",
+      "lugar": "Bogota (Biblioteca)",
+      "clienteId": "1724548719812",
+      "fecha": "2024-08-27T15:02:52.742Z"
     }
   ],
   "pedidosCliente": [
     {
-      "id": "1",
-      "clienteId": "1724548719812",
-      "producto": "Producto A",
-      "cantidad": 2,
-      "estado": "Enviado",
-      "fecha": "2024-08-24T12:00:00Z",
-      "carga": 100
+      "estado": "Aceptado",
+      "id": "1724770558130"
     },
     {
-      "id": "2",
-      "clienteId": "1724548719813",
-      "producto": "Producto B",
-      "cantidad": 1,
-      "estado": "Pendiente",
-      "fecha": "2024-08-25T08:30:00Z",
-      "carga": 100
+      "estado": "Aceptado",
+      "id": "1724770972742"
     }
   ]
 }
