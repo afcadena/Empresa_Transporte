@@ -140,7 +140,7 @@ const SidebarCliente = () => {
             />
             <Item
               title="Notificaciones"
-              to="/client_notifications" // Ajustar a la ruta para las notificaciones del cliente
+              to="/notificacionesClie" // Ajustar a la ruta para las notificaciones del cliente
               icon={<NotificationsActiveIcon />}
               selected={selected}
               setSelected={setSelected}

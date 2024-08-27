@@ -1,4 +1,3 @@
-// File: SidebarComponent.jsx
 import React, { useState, useEffect } from 'react';
 import { Sidebar as ProSidebar, Menu, MenuItem } from 'react-pro-sidebar';
 import { Box, IconButton, Typography, useTheme } from '@mui/material';
@@ -157,8 +156,15 @@ const SidebarComponent = () => {
               setSelected={setSelected}
             />
             <Item
-              title="Notificaciones"  // Nuevo elemento para "Notificaciones"
+              title="Notificaciones Conductores"
               to="/notificaciones"
+              icon={<NotificationsActiveIcon />} 
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Notificaciones Clientes"
+              to="/notificacionesCliente"
               icon={<NotificationsActiveIcon />} 
               selected={selected}
               setSelected={setSelected}

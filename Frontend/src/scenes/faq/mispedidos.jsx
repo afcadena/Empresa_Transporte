@@ -1,6 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Alert } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Alert
+} from '@mui/material';
 
 const MisPedidos = () => {
   const [pedidos, setPedidos] = useState([]);
@@ -11,9 +28,11 @@ const MisPedidos = () => {
     cantidad: 0,
     estado: 'Pendiente',
     carga: 0,
+    lugar: '',  // Nuevo campo para el lugar
   });
   const [mensajeError, setMensajeError] = useState('');
   const [showNotificationDialog, setShowNotificationDialog] = useState(false);
+  const [clienteNombre, setClienteNombre] = useState(''); // Para almacenar el nombre del cliente
   const clienteId = localStorage.getItem('userId'); // Recupera el ID del cliente desde el localStorage
 
   useEffect(() => {
@@ -24,14 +43,24 @@ const MisPedidos = () => {
 
     const fetchPedidos = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/pedidos?clienteId=${clienteId}`);
+        const response = await axios.get(`http://localhost:3001/pedidosCliente?clienteId=${clienteId}`);
         setPedidos(response.data);
       } catch (error) {
         setError('Error al cargar los pedidos.');
       }
     };
 
+    const fetchCliente = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3001/clientes/${clienteId}`);
+        setClienteNombre(response.data.nombre); // Almacenar el nombre del cliente
+      } catch (error) {
+        setError('Error al cargar los detalles del cliente.');
+      }
+    };
+
     fetchPedidos();
+    fetchCliente(); // Obtener el nombre del cliente
   }, [clienteId]);
 
   const handleOpenDialog = () => {
@@ -62,17 +91,19 @@ const MisPedidos = () => {
 
       const newPedido = { ...nuevoPedido, clienteId, id: newId, fecha: new Date().toISOString() };
 
-      // Enviar el pedido a la tabla de pedidos
-      await axios.post('http://localhost:3001/pedidos', newPedido);
+      // Enviar el pedido a la tabla de pedidosCliente
+      await axios.post('http://localhost:3001/pedidosCliente', newPedido);
 
-      // Agregar el pedido a la tabla de encargos
-      await axios.post('http://localhost:3001/encargos', newPedido);
+      // Agregar el pedido a la tabla de encargosCliente
+      await axios.post('http://localhost:3001/encargosCliente', newPedido);
 
-      // Enviar notificación al administrador
-      await axios.post('http://localhost:3001/notificaciones', {
+      // Enviar notificación al cliente
+      await axios.post('http://localhost:3001/notificaciones_cliente', {
         id: newId,
-        mensaje: `Nuevo pedido con ID ${newId} realizado por el cliente ${clienteId}.`,
-        estado: 'pendiente',
+        clienteId,
+        mensaje: `Tu pedido con ID ${newId} ha sido enviado.`,
+        estado: 'enviado',
+        fecha: new Date().toISOString(),
       });
 
       // Mostrar ventana emergente de confirmación
@@ -88,6 +119,7 @@ const MisPedidos = () => {
         cantidad: 0,
         estado: 'Pendiente',
         carga: 0,
+        lugar: '',  // Limpiar el campo lugar
       });
       setMensajeError('');
     } catch (error) {
@@ -119,6 +151,7 @@ const MisPedidos = () => {
               <TableCell>Estado</TableCell>
               <TableCell>Fecha</TableCell>
               <TableCell>Carga</TableCell>
+              <TableCell>Lugar</TableCell>  {/* Nueva columna para Lugar */}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -130,6 +163,7 @@ const MisPedidos = () => {
                 <TableCell>{pedido.estado}</TableCell>
                 <TableCell>{new Date(pedido.fecha).toLocaleDateString()}</TableCell>
                 <TableCell>{pedido.carga}</TableCell>
+                <TableCell>{pedido.lugar}</TableCell> {/* Mostrar el lugar */}
               </TableRow>
             ))}
           </TableBody>
@@ -156,7 +190,7 @@ const MisPedidos = () => {
             margin="normal"
           />
           <TextField
-            label="Carga"
+            label="Carga (kg)"
             name="carga"
             type="number"
             value={nuevoPedido.carga}
@@ -164,6 +198,14 @@ const MisPedidos = () => {
             fullWidth
             margin="normal"
           />
+          <TextField
+            label="Lugar"
+            name="lugar"
+            value={nuevoPedido.lugar}
+            onChange={handleInputChange}
+            fullWidth
+            margin="normal"
+          /> {/* Campo añadido para el lugar */}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog} color="primary">
@@ -177,7 +219,7 @@ const MisPedidos = () => {
       <Dialog open={showNotificationDialog} onClose={handleCloseNotificationDialog}>
         <DialogTitle>Notificación Enviada</DialogTitle>
         <DialogContent>
-          <Typography>La notificación al administrador ha sido enviada con éxito.</Typography>
+          <Typography>La notificación al cliente ha sido enviada con éxito.</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseNotificationDialog} color="primary">

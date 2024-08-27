@@ -35,8 +35,20 @@ const EntregasPendientes = () => {
       axios.get(`http://localhost:3001/encargos`)
         .then((response) => {
           const entregasTotales = response.data; // Asumimos que la API devuelve todas las entregas
-          // Filtramos por el nombre del conductor obtenido del camión
-          const entregasFiltradas = entregasTotales.filter(entrega => entrega.extendedProps.conductor === conductorNombre); 
+          
+          // Verificar si extendedProps existe y tiene conductor
+          const entregasFiltradas = entregasTotales.filter(entrega => {
+            if (!entrega.extendedProps) {
+              console.warn(`Entrega con ID ${entrega.id} no tiene extendedProps.`);
+              return false;
+            }
+            if (!entrega.extendedProps.conductor) {
+              console.warn(`Entrega con ID ${entrega.id} no tiene conductor en extendedProps.`);
+              return false;
+            }
+            return entrega.extendedProps.conductor === conductorNombre;
+          });
+
           if (entregasFiltradas.length > 0) {
             setEntregas(entregasFiltradas);
           } else {
@@ -116,11 +128,11 @@ const EntregasPendientes = () => {
           <TableBody>
             {entregas.map((entrega) => (
               <TableRow key={entrega.id.toString()}> 
-                <TableCell>{`Entrega de ${entrega.extendedProps.carga} Kg`}</TableCell>
+                <TableCell>{`Entrega de ${entrega.extendedProps?.carga || 'N/A'} Kg`}</TableCell>
                 <TableCell>{entrega.start}</TableCell>
                 <TableCell>{entrega.end || entrega.start}</TableCell>
-                <TableCell>{entrega.extendedProps.destinacion}</TableCell>
-                <TableCell>{entrega.extendedProps.carga}</TableCell>
+                <TableCell>{entrega.extendedProps?.destinacion || 'N/A'}</TableCell>
+                <TableCell>{entrega.extendedProps?.carga || 'N/A'}</TableCell>
                 <TableCell>
                   <Button variant="contained" color="primary" onClick={() => handleFinalizarClick(entrega)}>
                     Finalizar

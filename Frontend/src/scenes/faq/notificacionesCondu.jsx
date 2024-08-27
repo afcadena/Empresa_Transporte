@@ -22,14 +22,14 @@ const NotificacionesConductores = () => {
   const [notificaciones, setNotificaciones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedNotificacion, setSelectedNotificacion] = useState(null);
-  const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
-  const [clienteDetails, setClienteDetails] = useState(null);
+  const [selectedNotificacion, setSelectedNotificacion] = useState(null); 
+  const [openDetailsDialog, setOpenDetailsDialog] = useState(false); 
 
   useEffect(() => {
-    axios.get("http://localhost:3001/notificaciones?tipo=conductores")
+    // Obtener las notificaciones desde el servidor
+    axios.get("http://localhost:3001/notificaciones")
       .then((response) => {
-        setNotificaciones(response.data.filter(noti => noti.estado !== 'aceptada' && noti.estado !== 'confirmada'));
+        setNotificaciones(response.data.filter(noti => noti.estado !== 'aceptada' && noti.estado !== 'confirmada' && noti.tipo === 'conductor'));
       })
       .catch((error) => {
         console.error("Error al obtener las notificaciones:", error.response ? error.response.data : error.message);
@@ -48,8 +48,11 @@ const NotificacionesConductores = () => {
       return;
     }
 
+    console.log("Aceptando notificación con ID:", encargoId);
+
     axios.put(`http://localhost:3001/notificaciones/${encargoId}`, { estado: 'aceptada' })
       .then(() => {
+        console.log("Eliminando encargo con ID:", encargoId);
         return axios.delete(`http://localhost:3001/encargos/${encargoId}`);
       })
       .then(() => {
@@ -60,11 +63,13 @@ const NotificacionesConductores = () => {
         });
       })
       .then(() => {
-        setNotificaciones(prev => prev.filter(n => n.id !== encargoId));
-        alert("Notificación aceptada y encargo eliminado.");
+        setNotificaciones((prevNotificaciones) =>
+          prevNotificaciones.filter(n => n.id !== encargoId)
+        );
+        alert("Notificación aceptada, encargo eliminado y confirmación enviada al conductor.");
       })
       .catch((error) => {
-        console.error("Error al aceptar la notificación o eliminar el encargo:", error.response ? error.response.data : error.message);
+        console.error("Error al aceptar la notificación, eliminar el encargo o enviar confirmación:", error.response ? error.response.data : error.message);
         alert("Hubo un problema al aceptar la notificación o eliminar el encargo.");
       });
   };
@@ -77,7 +82,9 @@ const NotificacionesConductores = () => {
 
     axios.put(`http://localhost:3001/notificaciones/${id}`, { estado: 'rechazada' })
       .then(() => {
-        setNotificaciones(prev => prev.filter(n => n.id !== id));
+        setNotificaciones((prevNotificaciones) =>
+          prevNotificaciones.filter(n => n.id !== id)
+        );
         alert("Notificación rechazada con éxito.");
       })
       .catch((error) => {
@@ -88,38 +95,26 @@ const NotificacionesConductores = () => {
 
   const handleViewDetails = (notificacion) => {
     const encargoId = notificacion.id;
-    const clienteId = notificacion.clienteId;
 
-    if (!encargoId || !clienteId) {
-      alert("ID de notificación o cliente no válido.");
+    if (!encargoId) {
+      alert("ID de notificación no válido para detalles.");
       return;
     }
 
     axios.get(`http://localhost:3001/encargos/${encargoId}`)
       .then((response) => {
-        return Promise.all([
-          axios.get(`http://localhost:3001/clientes/${clienteId}`),
-          response
-        ]);
-      })
-      .then(([clienteResponse, encargoResponse]) => {
-        setClienteDetails(clienteResponse.data);
-        setSelectedNotificacion({
-          ...notificacion,
-          encargoDetails: encargoResponse.data
-        });
+        setSelectedNotificacion({ ...notificacion, encargoDetails: response.data });
         setOpenDetailsDialog(true);
       })
       .catch((error) => {
-        console.error("Error al obtener los detalles del encargo o del cliente:", error.response ? error.response.data : error.message);
-        alert("Error al cargar los detalles del encargo o del cliente.");
+        console.error("Error al obtener los detalles del encargo:", error.response ? error.response.data : error.message);
+        alert("Error al cargar los detalles del encargo.");
       });
   };
 
   const handleCloseDetailsDialog = () => {
     setOpenDetailsDialog(false);
     setSelectedNotificacion(null);
-    setClienteDetails(null);
   };
 
   if (loading) {
@@ -132,7 +127,9 @@ const NotificacionesConductores = () => {
 
   return (
     <Box m="20px">
-      <Typography variant="h4" gutterBottom>Notificaciones de Conductores</Typography>
+      <Typography variant="h4" gutterBottom>
+        Notificaciones de Conductores
+      </Typography>
 
       <Paper>
         <List>
@@ -179,7 +176,9 @@ const NotificacionesConductores = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDetailsDialog} color="primary">Cerrar</Button>
+          <Button onClick={handleCloseDetailsDialog} color="primary">
+            Cerrar
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

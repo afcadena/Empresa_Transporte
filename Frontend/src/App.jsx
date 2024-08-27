@@ -18,6 +18,7 @@ import ConductorNotifications from "./scenes/faq/condunotis";
 import ClienteNotifications from "./scenes/faq/clientenotis";
 import MisPedidos from "./scenes/faq/mispedidos";
 import Cuenta from "./scenes/faq/cuenta";
+import NotificacionesClientes from "./scenes/faq/notificacionesCliente"
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -54,6 +55,7 @@ function App() {
             <Routes>
               <Route path="/cuenta" element={<Cuenta />} />
               <Route path="/mis_pedidos" element={<MisPedidos />} />
+              <Route path="/notificacionesClie" element={<ClienteNotifications/>} />
             </Routes>
           </main>
         </>
@@ -69,6 +71,7 @@ function App() {
               <Route path="/form" element={<Form />} />
               <Route path="/cargar_camion" element={<CargarCamion />} />
               <Route path="/notificaciones" element={<Notificaciones />} />
+              <Route path="/notificacionesCliente" element={<NotificacionesClientes />} />
             </Routes>
           </main>
         </>

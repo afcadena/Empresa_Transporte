@@ -27,7 +27,7 @@
       "id": "1723584669165",
       "matricula": "FGR456",
       "capacidadCargaKg": "100",
-      "consumoGasolinaGalonesPorKm": "0.4",
+      "consumoGasolinaGalonesPorKm": "0.6",
       "cargaActualKg": 0,
       "conductor": "Carlos",
       "correo": "carlos@test.com",
@@ -84,7 +84,30 @@
       "rol": "cliente"
     }
   ],
-  "pedidos": [
+  "pedidos": [],
+  "encargos": [],
+  "notificaciones": [],
+  "notificaciones_cliente": [
+    {
+      "id": "3",
+      "clienteId": "1724548719812",
+      "mensaje": "Tu encargo con ID 1724716712463 ha sido confirmado.",
+      "estado": "confirmado",
+      "fecha": "2024-08-26T23:58:32.463Z"
+    }
+  ],
+  "encargosCliente": [
+    {
+      "id": "1724716712463",
+      "clienteId": "1724548719812",
+      "producto": "Papel",
+      "cantidad": "20",
+      "estado": "Pendiente",
+      "carga": "200",
+      "fecha": "2024-08-26T23:58:32.463Z"
+    }
+  ],
+  "pedidosCliente": [
     {
       "id": "1",
       "clienteId": "1724548719812",
@@ -92,7 +115,7 @@
       "cantidad": 2,
       "estado": "Enviado",
       "fecha": "2024-08-24T12:00:00Z",
-      "carga": 0
+      "carga": 100
     },
     {
       "id": "2",
@@ -101,64 +124,7 @@
       "cantidad": 1,
       "estado": "Pendiente",
       "fecha": "2024-08-25T08:30:00Z",
-      "carga": 0
-    },
-    {
-      "id": "1724639534926",
-      "producto": "Arroz",
-      "cantidad": "10",
-      "estado": "Pendiente",
-      "carga": "100",
-      "clienteId": "1724548719813",
-      "fecha": "2024-08-26T02:32:14.926Z"
-    }
-  ],
-  "encargos": [
-    {
-      "id": "1724639534926",
-      "producto": "Arroz",
-      "cantidad": "10",
-      "estado": "Pendiente",
-      "carga": "100",
-      "clienteId": "1724548719813",
-      "fecha": "2024-08-26T02:32:14.926Z"
-    }
-  ],
-  "notificaciones": [
-    {
-      "estado": "aceptada",
-      "id": "4988465440426"
-    },
-    {
-      "id": "6ee1",
-      "conductor": "Fabio",
-      "mensaje": "Tu encargo con ID 4988465440426 ha sido aceptado y eliminado.",
-      "estado": "confirmada"
-    },
-    {
-      "estado": "aceptada",
-      "id": "8954057363886"
-    },
-    {
-      "id": "ce96",
-      "conductor": "Juan",
-      "mensaje": "Tu encargo con ID 8954057363886 ha sido aceptado y eliminado.",
-      "estado": "confirmada"
-    },
-    {
-      "estado": "aceptada",
-      "id": "9775929850141"
-    },
-    {
-      "id": "bdb4",
-      "conductor": "Luis",
-      "mensaje": "Tu encargo con ID 9775929850141 ha sido aceptado y eliminado.",
-      "estado": "confirmada"
-    },
-    {
-      "id": "1724639534926",
-      "mensaje": "Nuevo pedido con ID 1724639534926 realizado por el cliente 1724548719813.",
-      "estado": "pendiente"
+      "carga": 100
     }
   ]
 }

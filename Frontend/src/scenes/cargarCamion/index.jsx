@@ -92,7 +92,9 @@ const CargarCamion = () => {
         return axios.get("http://localhost:3001/encargos");
       })
       .then((response) => {
-        const eventosAEliminar = response.data.filter(evento => evento.extendedProps.camion === camionToReset.matricula);
+        const eventosAEliminar = response.data.filter(evento => 
+          evento.extendedProps && evento.extendedProps.camion === camionToReset.matricula
+        );
         const deleteRequests = eventosAEliminar.map(evento => 
           axios.delete(`http://localhost:3001/encargos/${evento.id}`)
         );
@@ -244,27 +246,24 @@ const CargarCamion = () => {
       <Dialog open={openConfirmDownload} onClose={cancelResetCarga}>
         <DialogTitle>Confirmar Descarga</DialogTitle>
         <DialogContent>
-          ¿Está seguro de que desea descargar este camión?
+          ¿Está seguro de que desea restablecer la carga de este camión y eliminar todos los eventos asociados?
         </DialogContent>
         <DialogActions>
           <Button onClick={cancelResetCarga} color="primary">
-            No
+            Cancelar
           </Button>
-          <Button onClick={confirmResetCarga} color="primary">
-            Sí
+          <Button onClick={confirmResetCarga} color="secondary">
+            Confirmar
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Diálogo de éxito */}
       <Dialog open={openSuccessDialog} onClose={handleCloseSuccessDialog}>
         <DialogTitle>Éxito</DialogTitle>
-        <DialogContent>
-          La entrega se ha completado con éxito.
-        </DialogContent>
+        <DialogContent>El camión ha sido actualizado y los eventos han sido eliminados.</DialogContent>
         <DialogActions>
           <Button onClick={handleCloseSuccessDialog} color="primary">
-            Aceptar
+            Cerrar
           </Button>
         </DialogActions>
       </Dialog>
