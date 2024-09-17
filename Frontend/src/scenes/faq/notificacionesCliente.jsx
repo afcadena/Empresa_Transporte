@@ -12,7 +12,8 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Button
+  Button,
+  Snackbar
 } from "@mui/material";
 import axios from "axios";
 import CheckIcon from '@mui/icons-material/Check';
@@ -25,6 +26,10 @@ const NotificacionesClientes = () => {
   const [selectedNotificacion, setSelectedNotificacion] = useState(null);
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
   const [encargoDetails, setEncargoDetails] = useState(null);
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   useEffect(() => {
     // Obtener notificaciones de clientes
@@ -41,11 +46,21 @@ const NotificacionesClientes = () => {
       });
   }, []);
 
+  const handleSnackbarOpen = (message, severity = "success") => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
   const handleAceptar = (notificacion) => {
     const encargoId = notificacion.id;
 
     if (!encargoId) {
-      alert("No se encontró un ID de encargo válido para esta notificación.");
+      handleSnackbarOpen("No se encontró un ID de encargo válido para esta notificación.", "error");
       return;
     }
 
@@ -64,28 +79,28 @@ const NotificacionesClientes = () => {
       })
       .then(() => {
         setNotificaciones(prev => prev.filter(n => n.id !== encargoId));
-        alert("Notificación aceptada y estado del encargo actualizado a 'Aceptado'.");
+        handleSnackbarOpen("Notificación aceptada y estado del encargo actualizado a 'Aceptado'.");
       })
       .catch((error) => {
         console.error("Error al aceptar la notificación o actualizar el encargo:", error.response ? error.response.data : error.message);
-        alert("Hubo un problema al aceptar la notificación o actualizar el encargo.");
+        handleSnackbarOpen("Hubo un problema al aceptar la notificación o actualizar el encargo.", "error");
       });
   };
 
   const handleRechazar = (id) => {
     if (!id) {
-      alert("ID de notificación no válido.");
+      handleSnackbarOpen("ID de notificación no válido.", "error");
       return;
     }
 
     axios.put(`http://localhost:3001/notificaciones_cliente/${id}`, { estado: 'rechazada' })
       .then(() => {
         setNotificaciones(prev => prev.filter(n => n.id !== id));
-        alert("Notificación rechazada con éxito.");
+        handleSnackbarOpen("Notificación rechazada con éxito.");
       })
       .catch((error) => {
         console.error("Error al rechazar la notificación:", error.response ? error.response.data : error.message);
-        alert("Hubo un problema al rechazar la notificación.");
+        handleSnackbarOpen("Hubo un problema al rechazar la notificación.", "error");
       });
   };
 
@@ -93,7 +108,7 @@ const NotificacionesClientes = () => {
     const encargoId = notificacion.id;
 
     if (!encargoId) {
-      alert("ID de notificación no válido.");
+      handleSnackbarOpen("ID de notificación no válido.", "error");
       return;
     }
 
@@ -106,7 +121,7 @@ const NotificacionesClientes = () => {
       })
       .catch((error) => {
         console.error("Error al obtener los detalles del encargo:", error.response ? error.response.data : error.message);
-        alert("Error al cargar los detalles del encargo.");
+        handleSnackbarOpen("Error al cargar los detalles del encargo.", "error");
       });
   };
 
@@ -177,6 +192,23 @@ const NotificacionesClientes = () => {
           <Button onClick={handleCloseDetailsDialog} color="primary">Cerrar</Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        message={snackbarMessage}
+        action={
+          <IconButton color="inherit" onClick={handleSnackbarClose}>
+            <CloseIcon />
+          </IconButton>
+        }
+        ContentProps={{
+          sx: {
+            backgroundColor: snackbarSeverity === "error" ? "error.main" : "success.main",
+          },
+        }}
+      />
     </Box>
   );
 };

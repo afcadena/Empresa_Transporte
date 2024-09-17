@@ -27,8 +27,8 @@
       "id": "1723584669165",
       "matricula": "FGR456",
       "capacidadCargaKg": "100",
-      "consumoGasolinaGalonesPorKm": "0.6",
-      "cargaActualKg": 0,
+      "consumoGasolinaGalonesPorKm": "0.7",
+      "cargaActualKg": 80,
       "conductor": "Carlos",
       "correo": "carlos@test.com",
       "contraseña": "1234567890",
@@ -64,7 +64,18 @@
       "conductor": "Fabio",
       "correo": "fabio@test.com",
       "contraseña": "123456789",
-      "cargaActualKg": 350,
+      "cargaActualKg": 0,
+      "rol": "conductor"
+    },
+    {
+      "id": "1726538013473",
+      "matricula": "QWH437",
+      "capacidadCargaKg": 200,
+      "consumoGasolinaGalonesPorKm": 1.5,
+      "conductor": "García",
+      "correo": "garcia@test.com",
+      "contraseña": "123456789",
+      "cargaActualKg": 0,
       "rol": "conductor"
     }
   ],
@@ -82,6 +93,20 @@
       "correo": "cliente2@example.com",
       "contraseña": "cliente456",
       "rol": "cliente"
+    },
+    {
+      "id": "1726070608512",
+      "nombre": "Jose Francisco",
+      "correo": "jose1@gmail.com",
+      "contraseña": "123456789",
+      "rol": "cliente"
+    },
+    {
+      "id": "1726072195116",
+      "nombre": "Darwin",
+      "correo": "darwin@gmail.com",
+      "contraseña": "Darwin1234@",
+      "rol": "cliente"
     }
   ],
   "pedidos": [],
@@ -95,6 +120,50 @@
       "id": "51ad",
       "conductor": "Fabio",
       "mensaje": "Tu encargo con ID 2176121344842 ha sido aceptado y eliminado.",
+      "estado": "confirmada"
+    },
+    {
+      "estado": "aceptada",
+      "id": "6518358614610"
+    },
+    {
+      "id": "d77b",
+      "conductor": "Luis",
+      "mensaje": "Tu encargo con ID 6518358614610 ha sido aceptado y eliminado.",
+      "estado": "confirmada"
+    },
+    {
+      "estado": "rechazada",
+      "id": "3294618620876"
+    },
+    {
+      "id": "3294618620876",
+      "conductor": "Carlos",
+      "encargo": "Encargo de Carlos - 40 Kg",
+      "fecha": "2024-09-20",
+      "mensaje": "El conductor ha finalizado el encargo."
+    },
+    {
+      "id": "3294618620876",
+      "conductor": "Carlos",
+      "encargo": "Encargo de Carlos - 40 Kg",
+      "fecha": "2024-09-20",
+      "mensaje": "El conductor ha finalizado el encargo."
+    },
+    {
+      "id": "545e",
+      "conductor": "Carlos",
+      "mensaje": "Tu encargo con ID 3294618620876 ha sido aceptado y eliminado.",
+      "estado": "confirmada"
+    },
+    {
+      "estado": "aceptada",
+      "id": "2278666589879"
+    },
+    {
+      "id": "adea",
+      "conductor": "Carlos",
+      "mensaje": "Tu encargo con ID 2278666589879 ha sido aceptado y eliminado.",
       "estado": "confirmada"
     }
   ],
@@ -132,6 +201,46 @@
       "clienteId": "1724548719812",
       "mensaje": "Tu encargo con ID 1724770972742 ha sido aceptado.",
       "estado": "confirmada"
+    },
+    {
+      "estado": "aceptada",
+      "id": "1726072263667"
+    },
+    {
+      "id": "ff51",
+      "clienteId": "1726072195116",
+      "mensaje": "Tu encargo con ID 1726072263667 ha sido aceptado.",
+      "estado": "confirmada"
+    },
+    {
+      "estado": "aceptada",
+      "id": "1726538336398"
+    },
+    {
+      "id": "6071",
+      "clienteId": "1724548719813",
+      "mensaje": "Tu encargo con ID 1726538336398 ha sido aceptado.",
+      "estado": "confirmada"
+    },
+    {
+      "estado": "aceptada",
+      "id": "1726538585323"
+    },
+    {
+      "id": "dabe",
+      "clienteId": "1724548719813",
+      "mensaje": "Tu encargo con ID 1726538585323 ha sido aceptado.",
+      "estado": "confirmada"
+    },
+    {
+      "estado": "aceptada",
+      "id": "1726538984465"
+    },
+    {
+      "id": "2726",
+      "clienteId": "1724548719813",
+      "mensaje": "Tu encargo con ID 1726538984465 ha sido aceptado.",
+      "estado": "confirmada"
     }
   ],
   "encargosCliente": [
@@ -154,6 +263,46 @@
       "lugar": "Bogota (Biblioteca)",
       "clienteId": "1724548719812",
       "fecha": "2024-08-27T15:02:52.742Z"
+    },
+    {
+      "id": "1726072263667",
+      "producto": "Arroz",
+      "cantidad": "10",
+      "estado": "Pendiente",
+      "carga": "20",
+      "lugar": "Supermecado La Doña",
+      "clienteId": "1726072195116",
+      "fecha": "2024-09-11T16:31:03.667Z"
+    },
+    {
+      "id": "1726538336398",
+      "producto": "Arroz",
+      "cantidad": "20",
+      "estado": "Pendiente",
+      "carga": "200",
+      "lugar": "Supermecado La Doña",
+      "clienteId": "1724548719813",
+      "fecha": "2024-09-17T01:58:56.401Z"
+    },
+    {
+      "id": "1726538585323",
+      "producto": "Libros",
+      "cantidad": "20",
+      "estado": "Pendiente",
+      "carga": "100",
+      "lugar": "Biblioteca Luis Angel Arango",
+      "clienteId": "1724548719813",
+      "fecha": "2024-09-17T02:03:05.323Z"
+    },
+    {
+      "id": "1726538984465",
+      "producto": "Papel",
+      "cantidad": "10",
+      "estado": "Pendiente",
+      "carga": "40",
+      "lugar": "Supermecado La Doña",
+      "clienteId": "1724548719813",
+      "fecha": "2024-09-17T02:09:44.465Z"
     }
   ],
   "pedidosCliente": [
@@ -164,6 +313,22 @@
     {
       "estado": "Aceptado",
       "id": "1724770972742"
+    },
+    {
+      "estado": "Aceptado",
+      "id": "1726072263667"
+    },
+    {
+      "estado": "Aceptado",
+      "id": "1726538336398"
+    },
+    {
+      "estado": "Aceptado",
+      "id": "1726538585323"
+    },
+    {
+      "estado": "Aceptado",
+      "id": "1726538984465"
     }
   ]
 }

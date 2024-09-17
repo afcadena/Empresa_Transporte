@@ -12,7 +12,9 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Button
+  Button,
+  Snackbar,
+  IconButton as SnackbarIconButton
 } from "@mui/material";
 import axios from "axios";
 import CheckIcon from '@mui/icons-material/Check';
@@ -24,6 +26,10 @@ const NotificacionesConductores = () => {
   const [error, setError] = useState(null);
   const [selectedNotificacion, setSelectedNotificacion] = useState(null); 
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false); 
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   useEffect(() => {
     // Obtener las notificaciones desde el servidor
@@ -40,11 +46,21 @@ const NotificacionesConductores = () => {
       });
   }, []);
 
+  const handleSnackbarOpen = (message, severity = "success") => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
   const handleAceptar = (notificacion) => {
     const encargoId = notificacion.id;
 
     if (!encargoId) {
-      alert("No se encontró un ID de encargo válido para esta notificación.");
+      handleSnackbarOpen("No se encontró un ID de encargo válido para esta notificación.", "error");
       return;
     }
 
@@ -66,17 +82,17 @@ const NotificacionesConductores = () => {
         setNotificaciones((prevNotificaciones) =>
           prevNotificaciones.filter(n => n.id !== encargoId)
         );
-        alert("Notificación aceptada, encargo eliminado y confirmación enviada al conductor.");
+        handleSnackbarOpen("Notificación aceptada, encargo eliminado y confirmación enviada al conductor.");
       })
       .catch((error) => {
         console.error("Error al aceptar la notificación, eliminar el encargo o enviar confirmación:", error.response ? error.response.data : error.message);
-        alert("Hubo un problema al aceptar la notificación o eliminar el encargo.");
+        handleSnackbarOpen("Hubo un problema al aceptar la notificación o eliminar el encargo.", "error");
       });
   };
 
   const handleRechazar = (id) => {
     if (!id) {
-      alert("ID de notificación no válido.");
+      handleSnackbarOpen("ID de notificación no válido.", "error");
       return;
     }
 
@@ -85,11 +101,11 @@ const NotificacionesConductores = () => {
         setNotificaciones((prevNotificaciones) =>
           prevNotificaciones.filter(n => n.id !== id)
         );
-        alert("Notificación rechazada con éxito.");
+        handleSnackbarOpen("Notificación rechazada con éxito.");
       })
       .catch((error) => {
         console.error("Error al rechazar la notificación:", error.response ? error.response.data : error.message);
-        alert("Hubo un problema al rechazar la notificación.");
+        handleSnackbarOpen("Hubo un problema al rechazar la notificación.", "error");
       });
   };
 
@@ -97,7 +113,7 @@ const NotificacionesConductores = () => {
     const encargoId = notificacion.id;
 
     if (!encargoId) {
-      alert("ID de notificación no válido para detalles.");
+      handleSnackbarOpen("ID de notificación no válido para detalles.", "error");
       return;
     }
 
@@ -108,7 +124,7 @@ const NotificacionesConductores = () => {
       })
       .catch((error) => {
         console.error("Error al obtener los detalles del encargo:", error.response ? error.response.data : error.message);
-        alert("Error al cargar los detalles del encargo.");
+        handleSnackbarOpen("Error al cargar los detalles del encargo.", "error");
       });
   };
 
@@ -181,6 +197,23 @@ const NotificacionesConductores = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        message={snackbarMessage}
+        action={
+          <SnackbarIconButton color="inherit" onClick={handleSnackbarClose}>
+            <CloseIcon />
+          </SnackbarIconButton>
+        }
+        ContentProps={{
+          sx: {
+            backgroundColor: snackbarSeverity === "error" ? "error.main" : "success.main",
+          },
+        }}
+      />
     </Box>
   );
 };

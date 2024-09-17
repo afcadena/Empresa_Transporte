@@ -4,12 +4,16 @@ import axios from 'axios';
 
 function Login_register() {
   const [signIn, setSignIn] = useState(true);
-  const [formData, setFormData] = useState({ nombre: '', correo: '', contraseña: '', rol: 'admin' });
+  const [formData, setFormData] = useState({ nombre: '', correo: '', contraseña: '' });
   const [loginError, setLoginError] = useState('');
+  const [registerError, setRegisterError] = useState('');
+  const [message, setMessage] = useState(''); // Nuevo estado para manejar los mensajes de éxito o error
 
   const toggle = (isSignIn) => {
     setSignIn(isSignIn);
     setLoginError('');
+    setRegisterError('');
+    setMessage(''); // Limpiar mensajes al cambiar entre login y registro
   };
 
   const handleInputChange = (e) => {
@@ -20,18 +24,41 @@ function Login_register() {
     });
   };
 
+  const validatePassword = (password) => {
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    return (
+      password.length >= minLength &&
+      hasUpperCase &&
+      hasLowerCase &&
+      hasNumber &&
+      hasSpecialChar
+    );
+  };
+
   const registerUser = async () => {
+    if (!validatePassword(formData.contraseña)) {
+      setRegisterError('La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo.');
+      return;
+    }
+
     try {
-      const endpoint = formData.rol === 'conductor' ? 'camiones' : formData.rol === 'cliente' ? 'clientes' : 'administrador';
-      await axios.post(`http://localhost:3001/${endpoint}`, {
+      const newUser = {
         ...formData,
-        id: Date.now(), // Genera un ID único basado en la marca de tiempo actual
-      });
-      alert('Usuario registrado con éxito');
+        rol: 'cliente',
+        id: Date.now(),
+      };
+
+      await axios.post(`http://localhost:3001/clientes`, newUser);
+      setMessage('Usuario registrado con éxito como cliente'); // Reemplazo de alert
       toggle(true);
     } catch (error) {
       console.error(error);
-      alert('Error al registrar el usuario.');
+      setMessage('Error al registrar el usuario.'); // Reemplazo de alert
     }
   };
 
@@ -43,41 +70,30 @@ function Login_register() {
         return;
       }
 
-      // Buscar en la tabla de administradores
       const adminRes = await axios.get(`http://localhost:3001/administrador?correo=${correo}`);
       const admin = adminRes.data.find((u) => u.correo === correo && u.contraseña === contraseña);
 
-      // Buscar en la tabla de camiones para encontrar conductores
       const conductorRes = await axios.get(`http://localhost:3001/camiones?correo=${correo}`);
       const conductor = conductorRes.data.find((u) => u.correo === correo && u.contraseña === contraseña);
 
-      // Buscar en la tabla de clientes
       const clienteRes = await axios.get(`http://localhost:3001/clientes?correo=${correo}`);
       const cliente = clienteRes.data.find((u) => u.correo === correo && u.contraseña === contraseña);
 
-      // Validar si el usuario es un administrador, conductor o cliente
       const user = admin || conductor || cliente;
 
       if (user) {
-        alert(`Inicio de sesión exitoso como ${user.rol}`);
+        setMessage(`Inicio de sesión exitoso como ${user.rol}`); // Reemplazo de alert
         localStorage.setItem('loggedIn', 'true');
         localStorage.setItem('userRole', user.rol);
         localStorage.setItem('userEmail', user.correo);
+        localStorage.setItem('userId', user.id);
 
-        // Guardar el ID del usuario si es un cliente
-        if (user.rol === 'cliente') {
-          localStorage.setItem('userId', cliente.id); // Guardar el ID del cliente en localStorage
-        } else {
-          localStorage.setItem('userId', user.id); // Guardar el ID del usuario en localStorage
-        }
-
-        // Redirigir al usuario según su rol
         if (user.rol === 'admin' || user.rol === 'superadmin') {
           window.location.href = '/form';
         } else if (user.rol === 'conductor') {
-          window.location.href = '/mi_camion'; // Cambiar a la ruta principal para conductores
+          window.location.href = '/mi_camion';
         } else if (user.rol === 'cliente') {
-          window.location.href = '/mis_pedidos'; // Cambiar a la ruta principal para clientes
+          window.location.href = '/mis_pedidos';
         }
       } else {
         setLoginError('Correo o contraseña incorrectos.');
@@ -99,6 +115,9 @@ function Login_register() {
 
   return (
     <Components.Container>
+      {/* Mostrar mensaje general */}
+      {message && <p style={{ color: 'green' }}>{message}</p>}
+      
       <Components.SignUpContainer signinIn={signIn}>
         <Components.Form onSubmit={handleSubmit}>
           <Components.Title>Crea Una cuenta</Components.Title>
@@ -123,16 +142,7 @@ function Login_register() {
             value={formData.contraseña}
             onChange={handleInputChange}
           />
-          <select
-            name='rol'
-            value={formData.rol}
-            onChange={handleInputChange}
-            style={{ padding: '10px', marginTop: '10px', borderRadius: '4px', width: '100%' }}
-          >
-            <option value='admin'>Administrador</option>
-            <option value='conductor'>Conductor</option>
-            <option value='cliente'>Cliente</option>
-          </select>
+          {registerError && <p style={{ color: 'red' }}>{registerError}</p>}
           <Components.Button type='submit'>Crear cuenta</Components.Button>
         </Components.Form>
       </Components.SignUpContainer>
@@ -175,10 +185,10 @@ function Login_register() {
           <Components.RightOverlayPanel signinIn={signIn}>
             <Components.OverlayTitle>Bienvenido a Empretransporte</Components.OverlayTitle>
             <Components.Paragraph>
-              Regístrate con tus datos personales y empieza a usar nuestra plataforma.
+              Para crear una cuenta nueva, por favor ingresa tus datos.
             </Components.Paragraph>
             <Components.GhostButton onClick={() => toggle(false)}>
-              Registrarse
+              Crear Cuenta
             </Components.GhostButton>
           </Components.RightOverlayPanel>
         </Components.Overlay>

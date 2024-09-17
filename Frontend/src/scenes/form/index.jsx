@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, Button, TextField } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -8,6 +8,7 @@ import axios from "axios";
 
 const Form = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
+  const [message, setMessage] = useState(""); // Nuevo estado para manejar los mensajes
 
   // Genera un ID único y lo convierte en una cadena con comillas
   const generateUniqueId = () => {
@@ -23,18 +24,21 @@ const Form = () => {
     })
     .then((response) => {
       console.log("Camión registrado con el rol de conductor:", response.data);
-      alert('Camión y conductor registrados con éxito');
+      setMessage("Camión y conductor registrados con éxito"); // Reemplazo de alert
       resetForm(); // Reinicia el formulario después de un registro exitoso
     })
     .catch((error) => {
       console.error("Error al registrar el camión y conductor:", error);
-      alert('Error al registrar el camión y conductor');
+      setMessage("Error al registrar el camión y conductor"); // Reemplazo de alert
     });
   };
 
   return (
     <Box m="20px">
       <Header title="REGISTRAR CAMIÓN" subtitle="Registrar un nuevo camión y conductor" />
+
+      {/* Mostrar mensaje general */}
+      {message && <p style={{ color: message.includes("éxito") ? 'green' : 'red' }}>{message}</p>}
 
       <Formik
         onSubmit={handleFormSubmit}

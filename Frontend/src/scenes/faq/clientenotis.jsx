@@ -6,6 +6,7 @@ const ClienteNotifications = () => {
   const [notificaciones, setNotificaciones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [message, setMessage] = useState(""); // Estado para manejar mensajes generales
 
   useEffect(() => {
     const userEmail = localStorage.getItem("userEmail");
@@ -18,12 +19,13 @@ const ClienteNotifications = () => {
           // Obtener las notificaciones relacionadas con el cliente
           axios.get(`http://localhost:3001/notificaciones_cliente?clienteId=${cliente.id}`)
             .then((response) => {
-              // Filtrar notificaciones para mostrar solo las que tienen estado "confirmada"
               const notificacionesFiltradas = response.data.filter(noti => noti.estado === 'confirmada');
               setNotificaciones(notificacionesFiltradas);
+              if (notificacionesFiltradas.length === 0) {
+                setMessage("No hay notificaciones confirmadas."); // Mensaje cuando no hay notificaciones
+              }
             })
             .catch((error) => {
-              console.error("Error al obtener las notificaciones:", error);
               setError("Error al cargar las notificaciones.");
             })
             .finally(() => {
@@ -35,7 +37,6 @@ const ClienteNotifications = () => {
         }
       })
       .catch((error) => {
-        console.error("Error al obtener los datos del cliente:", error);
         setError("Error al cargar los datos del cliente.");
         setLoading(false); // Termina el loading en caso de error
       });
@@ -45,15 +46,17 @@ const ClienteNotifications = () => {
     return <CircularProgress />;
   }
 
-  if (error) {
-    return <Typography color="error">{error}</Typography>;
-  }
-
   return (
     <Box m="20px">
       <Typography variant="h4" gutterBottom>
         Notificaciones Confirmadas
       </Typography>
+
+      {/* Mostrar error si existe */}
+      {error && <Typography color="error">{error}</Typography>}
+
+      {/* Mostrar mensaje si no hay notificaciones */}
+      {message && <Typography>{message}</Typography>}
 
       <TableContainer component={Paper} sx={{ mt: 4 }}>
         <Table>

@@ -1,4 +1,3 @@
-// File: Calendar.jsx
 import React, { useState, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import { formatDate } from "@fullcalendar/core";
@@ -37,6 +36,7 @@ const Calendar = () => {
   const [mejorCamion, setMejorCamion] = useState(null);
   const [openEventDetails, setOpenEventDetails] = useState(false);
   const [eventDetails, setEventDetails] = useState(null);
+  const [message, setMessage] = useState(""); // Nuevo estado para manejar mensajes de éxito/error
 
   useEffect(() => {
     axios
@@ -58,14 +58,13 @@ const Calendar = () => {
       .catch((error) => console.error("Error al obtener los encargos:", error));
   }, []);
 
-  // Función para generar un ID numérico como string sin escape de comillas
   const generateNumericId = () => {
     return Math.floor(Math.random() * 10000000000000).toString(); // Genera un número grande como string
   };
 
   const handleDateClick = (selected) => {
     setSelectedDate(selected);
-    setMejorCamion(getBestCamion()); // Actualiza mejorCamion al seleccionar la fecha
+    setMejorCamion(getBestCamion());
     setOpenForm(true);
   };
 
@@ -111,7 +110,7 @@ const Calendar = () => {
     const camionSeleccionado = getBestCamion();
 
     if (!camionSeleccionado) {
-      alert("No hay camiones disponibles para esta carga.");
+      setMessage("No hay camiones disponibles para esta carga."); // Reemplazo de alert
       return;
     }
 
@@ -143,7 +142,7 @@ const Calendar = () => {
         return axios.put(`http://localhost:3001/camiones/${camionSeleccionado.id}`, camionActualizado);
       })
       .then(() => {
-        alert(`El camión ${camionSeleccionado.matricula} ha sido cargado con ${formValues.carga} Kg.`);
+        setMessage(`El camión ${camionSeleccionado.matricula} ha sido cargado con ${formValues.carga} Kg.`); // Reemplazo de alert
         handleCloseForm();
       })
       .catch((error) => {
@@ -161,7 +160,7 @@ const Calendar = () => {
 
   const handleDeleteEvent = () => {
     if (!eventDetails?.id) {
-      alert("No se pudo obtener el ID del encargo.");
+      setMessage("No se pudo obtener el ID del encargo."); // Reemplazo de alert
       return;
     }
 
@@ -170,7 +169,7 @@ const Calendar = () => {
       .then(() => {
         const updatedEvents = currentEvents.filter(event => event.id !== eventDetails.id);
         setCurrentEvents(updatedEvents);
-        removeEventFromCalendar(eventDetails.camion); // Llamada para eliminar el evento del calendario
+        removeEventFromCalendar(eventDetails.camion);
         handleCloseEventDetails();
       })
       .catch((error) => console.error("Error al eliminar el encargo:", error));
@@ -178,7 +177,7 @@ const Calendar = () => {
 
   const handleEditEvent = () => {
     if (!eventDetails?.id) {
-      alert("No se pudo obtener el ID del encargo.");
+      setMessage("No se pudo obtener el ID del encargo."); // Reemplazo de alert
       return;
     }
 
@@ -214,7 +213,7 @@ const Calendar = () => {
       })
       .then(() => {
         setCurrentEvents(prevEvents => prevEvents.filter(event => event.extendedProps.camion !== matricula));
-        alert(`Evento relacionado con el camión ${matricula} ha sido eliminado del calendario.`);
+        setMessage(`Evento relacionado con el camión ${matricula} ha sido eliminado del calendario.`); // Reemplazo de alert
       })
       .catch((error) => {
         console.error("Error al eliminar el evento del calendario:", error);
@@ -224,6 +223,9 @@ const Calendar = () => {
   return (
     <Box m="20px">
       <Header title="Calendario" subtitle="Calendario de cargas y descargas de camiones" />
+
+      {/* Mostrar mensaje general */}
+      {message && <Typography style={{ color: message.includes("error") ? 'red' : 'green' }}>{message}</Typography>}
 
       <Box display="flex" justifyContent="space-between">
         <Box flex="1 1 20%" backgroundColor={colors.primary[400]} p="15px" borderRadius="4px">

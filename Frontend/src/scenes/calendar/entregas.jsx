@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Snackbar } from "@mui/material";
 import axios from "axios";
 
 const EntregasPendientes = () => {
   const [entregas, setEntregas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [conductorNombre, setConductorNombre] = useState(null); // Almacenamos el nombre del conductor
-  const [openDialog, setOpenDialog] = useState(false); // Estado para abrir el diálogo de confirmación
-  const [selectedEntrega, setSelectedEntrega] = useState(null); // Entrega seleccionada para finalizar
+  const [conductorNombre, setConductorNombre] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedEntrega, setSelectedEntrega] = useState(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false); // Estado para controlar el Snackbar
+  const [snackbarMessage, setSnackbarMessage] = useState(""); // Mensaje para el Snackbar
 
   useEffect(() => {
     const userEmail = localStorage.getItem("userEmail");
@@ -16,9 +18,9 @@ const EntregasPendientes = () => {
     // Primero obtenemos el camión y el nombre del conductor usando el correo electrónico
     axios.get(`http://localhost:3001/camiones?correo=${userEmail}`)
       .then((response) => {
-        const assignedCamion = response.data[0]; // Suponemos que el correo es único y devuelve un camión
+        const assignedCamion = response.data[0];
         if (assignedCamion) {
-          setConductorNombre(assignedCamion.conductor); // Guardamos el nombre del conductor
+          setConductorNombre(assignedCamion.conductor);
         } else {
           setError("No se encontró un camión asignado.");
         }
@@ -30,12 +32,11 @@ const EntregasPendientes = () => {
   }, []);
 
   useEffect(() => {
-    // Una vez que tengamos el nombre del conductor, hacemos la llamada para obtener las entregas
     if (conductorNombre) {
       axios.get(`http://localhost:3001/encargos`)
         .then((response) => {
-          const entregasTotales = response.data; // Asumimos que la API devuelve todas las entregas
-          
+          const entregasTotales = response.data;
+
           // Verificar si extendedProps existe y tiene conductor
           const entregasFiltradas = entregasTotales.filter(entrega => {
             if (!entrega.extendedProps) {
@@ -67,7 +68,7 @@ const EntregasPendientes = () => {
 
   const handleFinalizarClick = (entrega) => {
     setSelectedEntrega(entrega);
-    setOpenDialog(true); // Abrir el diálogo de confirmación
+    setOpenDialog(true);
   };
 
   const handleCloseDialog = () => {
@@ -77,26 +78,32 @@ const EntregasPendientes = () => {
 
   const handleConfirmFinalizar = () => {
     if (!selectedEntrega) {
-      alert("No se seleccionó ninguna entrega.");
+      setSnackbarMessage("No se seleccionó ninguna entrega.");
+      setSnackbarOpen(true);
       return;
     }
 
-    // Enviar la notificación al administrador con el ID del encargo seleccionado
     axios.post("http://localhost:3001/notificaciones", {
       conductor: conductorNombre,
       encargo: selectedEntrega.title,
       fecha: selectedEntrega.start,
       mensaje: "El conductor ha finalizado el encargo.",
-      id: selectedEntrega.id, // Usamos el ID del encargo como ID de la notificación
+      id: selectedEntrega.id,
     })
     .then(() => {
-      alert("Se ha enviado la notificación al administrador.");
+      setSnackbarMessage("Se ha enviado la notificación al administrador.");
+      setSnackbarOpen(true);
       handleCloseDialog();
     })
     .catch((error) => {
       console.error("Error al enviar la notificación:", error);
-      alert("Hubo un problema al enviar la notificación.");
+      setSnackbarMessage("Hubo un problema al enviar la notificación.");
+      setSnackbarOpen(true);
     });
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
   };
 
   if (loading) {
@@ -127,7 +134,7 @@ const EntregasPendientes = () => {
           </TableHead>
           <TableBody>
             {entregas.map((entrega) => (
-              <TableRow key={entrega.id.toString()}> 
+              <TableRow key={entrega.id.toString()}>
                 <TableCell>{`Entrega de ${entrega.extendedProps?.carga || 'N/A'} Kg`}</TableCell>
                 <TableCell>{entrega.start}</TableCell>
                 <TableCell>{entrega.end || entrega.start}</TableCell>
@@ -161,6 +168,14 @@ const EntregasPendientes = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Snackbar para notificaciones */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        message={snackbarMessage}
+      />
     </Box>
   );
 };
